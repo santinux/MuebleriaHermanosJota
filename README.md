@@ -248,6 +248,12 @@ Este proyecto es parte de un ejercicio académico y está bajo licencia MIT.
 
 ## 👥 Contribuidores
 
+Cuevas Alexis <br>
+Delgado Facundo <br>
+Guridi Ignacio Javier <br>
+Martel Valentina <br>
+Fuentes Santino
+
 Equipo Mueblería Hermanos Jota - Sprint 4
 
 ---
