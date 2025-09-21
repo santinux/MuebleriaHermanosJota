@@ -1,33 +1,50 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import NavBar from './components/NavBar';
+import Home from './components/Home';
+import Footer from './components/Footer';
+
+import './styles/App.css'
+import ProductDetail from './components/ProductDetail';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [actualPage, setActualPage] = useState('home'); //pagina para renderizar
+  const [cartItemCount, setCartItemCount] = useState(0); // contador de items en el carrito
+  const [selectedProduct, setSelectedProduct] = useState(null); // producto seleccionado para ver detalle
+
+  const handleSelectProduct = (product) => {
+    // Aquí puedes implementar la lógica para seleccionar un producto
+    // Por ejemplo, buscar el producto por ID y actualizar el estado
+    console.log("Producto seleccionado:", product);
+    setSelectedProduct(product);
+    setActualPage('product_detail');
+  }
+
+  const handleExitProductDetail = (actualPage) => {
+    setSelectedProduct(null);
+    setActualPage(actualPage);
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <header className="header">
+        <NavBar
+          actualPage={actualPage}
+          setActualPage={setActualPage}
+          cartItemCount={cartItemCount} />
+      </header>
+      <main>
+        {actualPage === 'home' && 
+          <Home 
+            setActualPage={setActualPage} 
+            handleSelectProduct={handleSelectProduct} />
+        }
+        {actualPage === 'products' && <h1>Products Page</h1>}
+        {actualPage === 'contact' && <h1>Contact Page</h1>}
+        {actualPage === 'product_detail' && <ProductDetail product={selectedProduct} onExit={handleExitProductDetail} />}
+      </main>
+      <footer className="footer">
+        <Footer />
+      </footer>
     </>
   )
 }
