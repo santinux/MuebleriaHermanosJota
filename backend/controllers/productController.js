@@ -1,5 +1,5 @@
 const products = require('../data/products');
-
+console.log(products);
 // Obtener todos los productos
 const getAllProducts = (req, res) => {
     try {

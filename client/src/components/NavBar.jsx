@@ -1,6 +1,6 @@
 
 import React from 'react'
-import '../App.css'
+import '../styles/App.css'
 
 const NavBar = ({ actualPage, setActualPage, cartItemCount }) => {
     // Falta implementar el carrito de compras
