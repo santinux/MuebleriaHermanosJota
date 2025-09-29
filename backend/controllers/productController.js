@@ -1,7 +1,7 @@
 const products = require('../data/products');
 
 // Obtener todos los productos
-const getAllProducts = (req, res) => {
+const getAllProducts = (req, res, next) => {
     try {
         res.json({
             success: true,
@@ -9,42 +9,35 @@ const getAllProducts = (req, res) => {
             count: products.length
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error interno del servidor',
-            error: error.message
-        });
+        // En caso de cualquier otro error, lo enviamos al manejador de errores
+        next(error);
     }
 };
 
 // Obtener producto por ID
-const getProductById = (req, res) => {
+const getProductById = (req, res, next) => {
     try {
         const { id } = req.params;
         const product = products.find(p => p.id === parseInt(id));
         
+        // Si no se encuentra el producto, se envía el error al manejador de errores
         if (!product) {
-            return res.status(404).json({
-                success: false,
-                message: 'Producto no encontrado'
-            });
+            const error = new Error('Producto no encontrado');
+            error.status = 404;
+            return next(error);
         }
-        
         res.json({
             success: true,
             data: product
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error interno del servidor',
-            error: error.message
-        });
+        // En caso de cualquier otro error, lo enviamos al manejador de errores
+        next(error);
     }
 };
 
 // Obtener productos destacados
-const getFeaturedProducts = (req, res) => {
+const getFeaturedProducts = (req, res, next) => {
     try {
         const featuredProducts = products.filter(product => product.featured);
         
@@ -54,16 +47,13 @@ const getFeaturedProducts = (req, res) => {
             count: featuredProducts.length
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error interno del servidor',
-            error: error.message
-        });
+        // En caso de cualquier otro error, lo enviamos al manejador de errores
+        next(error);
     }
 };
 
 // Buscar productos
-const searchProducts = (req, res) => {
+const searchProducts = (req, res, next) => {
     try {
         const { q } = req.query;
         
@@ -74,14 +64,12 @@ const searchProducts = (req, res) => {
                 count: products.length
             });
         }
-        
         const searchTerm = q.toLowerCase();
         const filteredProducts = products.filter(product => 
             product.name.toLowerCase().includes(searchTerm) ||
             product.description.toLowerCase().includes(searchTerm) ||
             product.category.toLowerCase().includes(searchTerm)
         );
-        
         res.json({
             success: true,
             data: filteredProducts,
@@ -89,11 +77,8 @@ const searchProducts = (req, res) => {
             searchTerm: q
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error interno del servidor',
-            error: error.message
-        });
+        // En caso de cualquier otro error, lo enviamos al manejador de errores
+        next(error);
     }
 };
 
