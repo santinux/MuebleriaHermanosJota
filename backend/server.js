@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const logger = require('./middleware/logger');
 const productRoutes = require('./routes/productRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -11,6 +12,7 @@ app.use(logger);
 
 // Middleware para resolver rutas
 app.use('/api/productos', productRoutes);
+app.use('/api', contactRoutes);
 
 // Middleware para rutas no encontradas (404)
 app.use((req, res, next) => {
