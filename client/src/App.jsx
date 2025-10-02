@@ -2,6 +2,7 @@ import { useState } from 'react'
 import NavBar from './components/NavBar';
 import Home from './components/Home';
 import Footer from './components/Footer';
+import Contact from './components/Contact';
 
 import './styles/App.css'
 import ProductDetail from './components/ProductDetail';
@@ -39,7 +40,7 @@ function App() {
             handleSelectProduct={handleSelectProduct} />
         }
         {actualPage === 'products' && <h1>Products Page</h1>}
-        {actualPage === 'contact' && <h1>Contact Page</h1>}
+        {actualPage === 'contact' && <Contact />}
         {actualPage === 'product_detail' && <ProductDetail product={selectedProduct} onExit={handleExitProductDetail} />}
       </main>
       <footer className="footer">
