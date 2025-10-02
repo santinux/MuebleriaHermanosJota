@@ -862,10 +862,20 @@ main {
     display: none;
     text-align: center;
     padding: var(--spacing-xl);
-    background-color: var(--success-color);
-    color: white;
+    background-color: var(--background-light);
+    color: var(--text-dark);
     border-radius: var(--radius-lg);
     animation: fadeIn 0.5s ease;
+}
+
+.success-message.show {
+    display: inline-block;
+    margin-top: var(--spacing-md);
+}
+
+.success-message .btn-secondary {
+    display: inline-block;
+    margin-top: var(--spacing-md);
 }
 
 /* Mejoras adicionales para móviles */
