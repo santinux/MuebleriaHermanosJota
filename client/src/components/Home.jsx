@@ -9,7 +9,6 @@ const Home = ({ setActualPage, handleSelectProduct }) => {
     
     useEffect(() => {
         getFeaturedProducts().then(products => {
-            
             setFeaturedProducts(products);
         }).catch(error => {
             console.error('Error loading featured products:', error);
@@ -34,7 +33,7 @@ const Home = ({ setActualPage, handleSelectProduct }) => {
                             featuredProducts.map(product => (
                                 <a className="product-card" key={product.id} onClick={() => handleSelectProduct(product)}>
                                     <div className="product-image">
-                                        <img src={'../../' + product.image} alt={product.name} />
+                                        <img src={product.image} alt={product.name} />
                                     </div>
                                     <div className="product-info">
                                         <h3 className="product-name">{product.name}</h3>
