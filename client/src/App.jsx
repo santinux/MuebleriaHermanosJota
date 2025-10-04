@@ -102,7 +102,7 @@ function App() {
           </>
         )}
 
-        {actualPage === "contact" && <h1>Contact Page</h1>}
+        {actualPage === 'contact' && <Contact />}
 
         {actualPage === "product_detail" && (
           <ProductDetail
