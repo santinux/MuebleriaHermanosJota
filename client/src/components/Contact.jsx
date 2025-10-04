@@ -32,7 +32,7 @@ function Contact() {
       return;
     }
 
-    fetch('/api/contacto', {
+    fetch('http://localhost:3000/api/contacto', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
