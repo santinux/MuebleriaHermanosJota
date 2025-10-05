@@ -6,6 +6,7 @@ import '../styles/App.css'
 
 const Home = ({ setActualPage, handleSelectProduct }) => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
+
     
     useEffect(() => {
         getFeaturedProducts().then(products => {
@@ -43,7 +44,7 @@ const Home = ({ setActualPage, handleSelectProduct }) => {
                         {/* Productos destacados se cargarán aquí dinámicamente */}
                         {featuredProducts.length > 0 ? 
                             featuredProducts.slice(0, 6).map(product => (
-                                <a className="product-card" key={product.id} onClick={() => handleSelectProduct(product)}>
+                                <a className="product-card" key={product.id} onClick={() => handleSelectProduct(product.id)}>
                                     <div className="product-image">
                                         <img src={product.image} alt={product.name} />
                                     </div>
@@ -60,6 +61,7 @@ const Home = ({ setActualPage, handleSelectProduct }) => {
                                 <div className="loading-spinner"></div>
                                 <p>Cargando productos destacados...</p>
                             </div>
+                            
                         )}
                     </div>
                     <div className="see-more-container">
@@ -69,15 +71,15 @@ const Home = ({ setActualPage, handleSelectProduct }) => {
                     </div>
                 </div>
             </section>
-            <section class="about">
-                <div class="container">
-                    <div class="about-content">
-                        <div class="about-text">
+            <section className="about">
+                <div className="container">
+                    <div className="about-content">
+                        <div className="about-text">
                             <h2>Nuestra Historia</h2>
                             <p>La familia Jota ha dedicado más de tres décadas al arte de la carpintería, creando muebles únicos que combinan la robustez de lo artesanal con líneas de diseño moderno.</p>
                             <p>Cada pieza es cuidadosamente elaborada con materiales de la más alta calidad, garantizando durabilidad y belleza que perdura a través del tiempo.</p>
                         </div>
-                        <div class="about-image">
+                        <div className="about-image">
                             <img src="https://images.pexels.com/photos/1080721/pexels-photo-1080721.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Taller de carpintería" />
                         </div>
                     </div>

@@ -17,19 +17,16 @@ function App() {
 
   // Cargar productos al inicio
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const data = await getFeaturedProducts();
-        setProducts(data);
-      } catch (error) {
-        console.error("Error cargando productos:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
+    setLoading(true);
+    getFeaturedProducts().then(data => {
+      setProducts(data);
+    }).catch(error => {
+      console.error("Error cargando productos:", error);
+    }).finally(() => {
+      setLoading(false);
+    });
   }, []);
+
   // Cargar carrito desde localStorage
   useEffect(() => {
     const savedCart = localStorage.getItem("reactShoppingCart");
@@ -47,8 +44,8 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [actualPage]);
 
-  const handleSelectProduct = (product) => {
-    setSelectedProduct(product);
+  const handleSelectProduct = (productId) => {
+    setSelectedProduct(productId);
     setActualPage("product_detail");
     // El useEffect se encarga del scroll automáticamente
   };
@@ -96,24 +93,18 @@ function App() {
         )}
 
         {actualPage === "products" && (
-          <>
-            {loading ? (
-              <p>Cargando productos...</p>
-            ) : (
-              <Products
-                products={products}
-                onProductClick={handleSelectProduct}
-                onAddToCart={handleAddToCart}
-              />
-            )}
-          </>
+          <Products
+            products={products}
+            onProductClick={handleSelectProduct}
+            onAddToCart={handleAddToCart}
+          />
         )}
 
         {actualPage === 'contact' && <Contact />}
 
         {actualPage === "product_detail" && (
           <ProductDetail
-            product={selectedProduct}
+            productId={selectedProduct}
             onExit={handleExitProductDetail}
             onAddToCart={handleAddToCart}
             allProducts={products}

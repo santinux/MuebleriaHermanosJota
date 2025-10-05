@@ -1,34 +1,55 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import ProductCard from "./ProductsCard.jsx";
+import { getAllProducts } from "../../services/productServices.js";
 
-const Products = ({ products, onProductClick, onAddToCart }) => {
+const Products = ({ onProductClick, onAddToCart }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isTipsVisible, setIsTipsVisible] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
   const tipsRef = useRef(null);
+
 
   // Función para manejar la búsqueda
   const handleSearch = (e) => {
     e.preventDefault();
-    const filtered = products.filter(product =>
+    setSearchTerm(e.target.value);
+    filterProductsBySearchTerm();
+  };
+
+  const handleSearchButtonClick = async () => {
+    setLoading(true);
+    // simula carga de red
+    await new Promise(r => setTimeout(r, 800));
+    filterProductsBySearchTerm();
+    setLoading(false);
+  };
+
+  const filterProductsBySearchTerm = () => {
+    if (searchTerm === "") {
+      setFilteredProducts(allProducts);
+      return;
+    }
+    const filtered = allProducts.filter(product =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredProducts(filtered);
   };
 
-  // Actualizar productos filtrados cuando cambien los productos o el término de búsqueda
-  React.useEffect(() => {
-    if (searchTerm === "") {
-      setFilteredProducts(products);
-    } else {
-      const filtered = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredProducts(filtered);
-    }
-  }, [products, searchTerm]);
+  useEffect(() => {
+    getAllProducts().then(data => {
+      setAllProducts(data);
+      setFilteredProducts(data);
+      setLoading(false);
+    }).catch(error => {
+      setLoading(false);
+      setFetchError(true);
+      console.error('Error loading products:', error);
+    });
+  }, []);
 
   // Intersection Observer para animar los tips cuando sean visibles
   useEffect(() => {
@@ -52,130 +73,109 @@ const Products = ({ products, onProductClick, onAddToCart }) => {
     };
   }, []);
 
-  if (!products || products.length === 0) {
-    return (
+
+  return (
+    <>
       <section className="catalog">
         <div className="container">
           <div className="catalog-header">
             <h1>Nuestro Catálogo</h1>
             <p>Descubre nuestra colección completa de muebles artesanales</p>
           </div>
-          
+
           <div className="search-section">
             <div className="search-box">
-              <input 
-                type="text" 
-                id="search-input" 
+              <input
+                type="text"
+                id="search-input"
                 placeholder="Buscar productos..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => handleSearch(e)}
               />
-              <button id="search-btn" onClick={handleSearch}>🔍</button>
+              <button id="search-btn" onClick={handleSearchButtonClick}>🔍</button>
             </div>
           </div>
 
           <div className="products-container">
-            <div className="loading" id="loading">
-              <div className="loading-spinner"></div>
-              <p>Cargando catálogo de productos...</p>
-            </div>
+            {loading ? (
+              <div className="loading" id="loading">
+                <div className="loading-spinner"></div>
+                <p>Cargando catálogo de productos...</p>
+              </div>
+            ) : (
+              <div className="products-grid" id="products-grid">
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onProductClick={onProductClick}
+                      onAddToCart={onAddToCart}
+                    />
+                  ))
+                ) : (<div style={{ textAlign: "center", color: "var(--text-medium)" }}>
+                  {fetchError ?
+                    (
+                      <p>Error al cargar los productos. Por favor, intentá nuevamente más tarde.</p>
+                    )
+                    : (
+                      <p>No se encontraron productos que coincidan con tu búsqueda.</p>
+                    )
+                  }
+                </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>
-    );
-  }
+      <aside>
+        <div ref={tipsRef} className={`container purchase-tips ${isTipsVisible ? 'show' : ''}`}>
+          <h3>Consejos de compra...</h3>
+          <p className="purchase-tips-intro">
+            Al comprar un mueble de nuestro catálogo, recordá que cada pieza está pensada para acompañarte
+            durante décadas, no temporadas.
+          </p>
+          <ul>
+            <li>
+              <p>
+                <b>Elegí con perspectiva.</b> Nuestros diseños abrazan principios atemporales que
+                permanecerán relevantes dentro de 20 años. Considerá cómo cada pieza dialogará tanto con tu espacio
+                actual como con los futuros.
+              </p>
+            </li>
+            <li>
+              <p>
+                <b>Invertí en historia.</b> Cada mueble lleva consigo la narrativa de los artesanos que lo
+                crearon y pronto, la tuya propia. Las marcas del uso diario no son imperfecciones; son
+                capítulos de una historia compartida.
+              </p>
+            </li>
+            <li>
+              <p>
+                <b>Entendé el proceso.</b> Nuestro trabajo honra técnicas tradicionales con precisión
+                contemporánea. Seleccionamos cada madera por su carácter único, respetamos los tiempos
+                naturales, y aplicamos uniones que se fortalecen con el tiempo.
+              </p>
+            </li>
+            <li>
+              <p>
+                <b>Pensá en el impacto.</b> Cuando elegís Hermanos Jota, te convertís en custodio de un
+                objeto diseñado para perdurar. No es consumo; es una alianza con el futuro.
+              </p>
+            </li>
+            <li>
+              <p>
+                <b>Prestigio en cada detalle.</b> La diferencia está en los detalles invisibles: acabados
+                que nutren la madera, uniones tradicionales que perduran, y el amor por el oficio transmitido de generación en generación.
+                No solo adquirís mobiliario; preservás un arte ancestral.
+              </p>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </>
+  );
+}
 
-      return (
-        <>
-          <section className="catalog">
-            <div className="container">
-              <div className="catalog-header">
-                <h1>Nuestro Catálogo</h1>
-                <p>Descubre nuestra colección completa de muebles artesanales</p>
-              </div>
-
-              <div className="search-section">
-                <div className="search-box">
-                  <input
-                    type="text"
-                    id="search-input"
-                    placeholder="Buscar productos..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <button id="search-btn" onClick={handleSearch}>🔍</button>
-                </div>
-              </div>
-
-              <div className="products-container">
-                {filteredProducts.length > 0 ? (
-                  <div className="products-grid" id="products-grid">
-                    {filteredProducts.map((product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        onProductClick={onProductClick}
-                        onAddToCart={onAddToCart}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div style={{ textAlign: "center", color: "var(--text-medium)" }}>
-                    <p>No se encontraron productos que coincidan con tu búsqueda.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-
-          {/* Consejos de compra */}
-          <aside>
-            <div ref={tipsRef} className={`container purchase-tips ${isTipsVisible ? 'show' : ''}`}>
-            <h3>Consejos de compra...</h3>
-            <p className="purchase-tips-intro">
-              Al comprar un mueble de nuestro catálogo, recordá que cada pieza está pensada para acompañarte
-              durante décadas, no temporadas.
-            </p>
-            <ul>
-              <li>
-                <p>
-                  <b>Elegí con perspectiva.</b> Nuestros diseños abrazan principios atemporales que
-                  permanecerán relevantes dentro de 20 años. Considerá cómo cada pieza dialogará tanto con tu espacio
-                  actual como con los futuros.
-                </p>
-              </li>
-              <li>
-                <p>
-                  <b>Invertí en historia.</b> Cada mueble lleva consigo la narrativa de los artesanos que lo
-                  crearon y pronto, la tuya propia. Las marcas del uso diario no son imperfecciones; son
-                  capítulos de una historia compartida.
-                </p>
-              </li>
-              <li>
-                <p>
-                  <b>Entendé el proceso.</b> Nuestro trabajo honra técnicas tradicionales con precisión
-                  contemporánea. Seleccionamos cada madera por su carácter único, respetamos los tiempos
-                  naturales, y aplicamos uniones que se fortalecen con el tiempo.
-                </p>
-              </li>
-              <li>
-                <p>
-                  <b>Pensá en el impacto.</b> Cuando elegís Hermanos Jota, te convertís en custodio de un
-                  objeto diseñado para perdurar. No es consumo; es una alianza con el futuro.
-                </p>
-              </li>
-              <li>
-                <p>
-                  <b>Prestigio en cada detalle.</b> La diferencia está en los detalles invisibles: acabados
-                  que nutren la madera, uniones tradicionales que perduran, y el amor por el oficio transmitido de generación en generación.
-                  No solo adquirís mobiliario; preservás un arte ancestral.
-                </p>
-              </li>
-            </ul>
-            </div>
-          </aside>
-        </>
-      );
-    };
-
-    export default Products;
+export default Products;

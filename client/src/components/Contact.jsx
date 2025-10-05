@@ -64,13 +64,8 @@ function Contact() {
       });
   };
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   return (
     <div>
-     
       <main>
         {/* Hero Section */}
         <section className="contact-hero">

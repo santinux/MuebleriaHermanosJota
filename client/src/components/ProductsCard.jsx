@@ -13,7 +13,7 @@ const ProductCard = ({ product, onProductClick}) => {
     <div className="product-card">
       <div
         className="product-link"
-        onClick={() => onProductClick(product)}
+        onClick={() => onProductClick(product.id)}
         style={{ cursor: "pointer" }}
       >
         <div className="product-image">
