@@ -1076,29 +1076,91 @@ main {
     .success-message {
         padding: var(--spacing-lg);
         margin: var(--spacing-md) 0;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
     }
     
     .success-message h3 {
-        font-size: 1.3rem;
+        font-size: 1.4rem;
+        margin-bottom: var(--spacing-md);
+        color: var(--primary-color);
+        font-family: var(--font-primary);
+        font-weight: 700;
     }
     
     .success-message p {
-        font-size: 0.9rem;
+        font-size: 1rem;
+        margin-bottom: var(--spacing-lg);
+        color: var(--text-medium);
+        line-height: 1.5;
+    }
+    
+    .success-message .btn-secondary {
+        width: 100%;
+        max-width: 280px;
+        padding: var(--spacing-sm) var(--spacing-lg);
+        font-size: 1rem;
+        font-weight: 600;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        border: 2px solid var(--primary-color);
+        background-color: var(--background-light);
+        color: var(--primary-color);
+        border-radius: var(--radius-md);
+        transition: var(--transition);
+    }
+    
+    .success-message .btn-secondary:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .success-message .btn-secondary:active {
+        transform: translateY(0);
     }
 }
 
 @media (max-width: 480px) {
     .success-message {
-        padding: var(--spacing-md);
-        margin: var(--spacing-sm) 0;
+        padding: var(--spacing-lg);
+        margin: var(--spacing-md) 0;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
     }
     
     .success-message h3 {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
+        margin-bottom: var(--spacing-sm);
+        line-height: 1.2;
     }
     
     .success-message p {
-        font-size: 0.85rem;
+        font-size: 0.95rem;
+        margin-bottom: var(--spacing-lg);
+        padding: 0 var(--spacing-xs);
+    }
+    
+    .success-message .btn-secondary {
+        width: 100%;
+        max-width: 240px;
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.95rem;
+        height: 44px;
+        margin: 0 auto;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+    
+    .success-message .btn-secondary:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.2);
     }
 }
 
