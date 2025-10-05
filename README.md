@@ -75,7 +75,7 @@ npm install
 **Terminal 1 - Backend:**
 ```bash
 cd backend
-npm start
+npm run dev
 ```
 El servidor backend estará disponible en: `http://localhost:3001`
 
