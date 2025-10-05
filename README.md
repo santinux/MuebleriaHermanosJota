@@ -57,27 +57,15 @@ cd muebleria-hermanos-jota
 
 ### 2. Instalar Dependencias
 
-#### Opción A: Usando archivos batch (Recomendado para Windows)
-```bash
-# Ejecutar el archivo batch para instalar todas las dependencias
-install-dependencies.bat
-```
-
-#### Opción B: Instalación manual
+#### Instalación manual
 ```bash
 # Backend
 cd backend
 npm install
 
 # Frontend
-cd ../client
+cd client
 npm install
-```
-
-### 3. Solución de Problemas con PowerShell
-Si encuentras errores de política de ejecución en PowerShell:
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 ## 🏃‍♂️ Ejecutar el Proyecto
@@ -94,17 +82,10 @@ El servidor backend estará disponible en: `http://localhost:3001`
 **Terminal 2 - Frontend:**
 ```bash
 cd client
-npm start
+npm run dev
 ```
 El frontend estará disponible en: `http://localhost:3000`
 
-### Opción 2: Ejecutar con Nodemon (Desarrollo)
-
-**Backend con auto-reload:**
-```bash
-cd backend
-npm run dev
-```
 
 ## 📡 API Endpoints
 
@@ -210,41 +191,6 @@ curl http://localhost:3001/api/productos/search?q=mesa
 - **Animaciones** suaves y transiciones
 - **Estados de carga** y manejo de errores
 - **Navegación intuitiva** entre secciones
-
-## 🔧 Scripts Disponibles
-
-### Backend:
-```bash
-npm start          # Iniciar servidor en producción
-npm run dev        # Iniciar con nodemon (desarrollo)
-```
-
-### Frontend:
-```bash
-npm start          # Iniciar servidor de desarrollo
-npm run build      # Construir para producción
-```
-
-## 🚨 Solución de Problemas
-
-### Error de Política de Ejecución (PowerShell):
-Si encuentras errores de política de ejecución en PowerShell:
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-### Puerto en Uso:
-Si el puerto 3000 o 3001 está en uso:
-- Backend: Cambiar `PORT` en `backend/server.js`
-- Frontend: React automáticamente sugerirá otro puerto
-
-### CORS Issues:
-El backend ya incluye middleware CORS configurado para el frontend.
-
-
-## 📄 Licencia
-
-Este proyecto es parte de un ejercicio académico y está bajo licencia MIT.
 
 ## 👥 Contribuidores
 
