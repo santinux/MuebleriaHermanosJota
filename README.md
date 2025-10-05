@@ -75,16 +75,16 @@ npm install
 **Terminal 1 - Backend:**
 ```bash
 cd backend
-npm run dev
+npm start
 ```
-El servidor backend estará disponible en: `http://localhost:3001`
+El servidor backend estará disponible en: `http://localhost:3000`
 
 **Terminal 2 - Frontend:**
 ```bash
 cd client
 npm run dev
 ```
-El frontend estará disponible en: `http://localhost:3000`
+El frontend estará disponible en: `http://localhost:5173`
 
 
 ## 📡 API Endpoints
