@@ -53,3 +53,20 @@ export const getProductById = async (id) => {
         throw error;
     }
 };
+
+export const searchProducts = async (searchTerm) => {
+    try {
+        const response = await fetch(`${BASE_URL}/search?q=${encodeURIComponent(searchTerm)}`);
+        if (!response.ok) {
+            throw new Error('Hubo un error en el servidor');
+        }
+        const { success, data, count } = await response.json();
+        if (!success) {
+            throw new Error('Hubo un error al buscar productos');
+        }
+        return data;
+    } catch (error) {
+        console.error('Error searching products:', error);
+        throw error;
+    }
+};

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import ProductCard from "./ProductsCard.jsx";
-import { getAllProducts } from "../../services/productServices.js";
+import { getAllProducts, searchProducts } from "../../services/productServices.js";
 
 const Products = ({ onProductClick, onAddToCart }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,9 +21,20 @@ const Products = ({ onProductClick, onAddToCart }) => {
 
   const handleSearchButtonClick = async () => {
     setLoading(true);
-    // simula carga de red
-    await new Promise(r => setTimeout(r, 800));
-    filterProductsBySearchTerm();
+    try {
+      if (searchTerm === "") {
+        // Si no hay término de búsqueda, mostrar todos los productos
+        setFilteredProducts(allProducts);
+      } else {
+        // Usar la búsqueda del backend
+        const searchResults = await searchProducts(searchTerm);
+        setFilteredProducts(searchResults);
+      }
+    } catch (error) {
+      console.error('Error searching products:', error);
+      // En caso de error, mostrar todos los productos como fallback
+      setFilteredProducts(allProducts);
+    }
     setLoading(false);
   };
 
@@ -32,6 +43,7 @@ const Products = ({ onProductClick, onAddToCart }) => {
       setFilteredProducts(allProducts);
       return;
     }
+    // Para búsqueda en tiempo real, usar filtrado local como fallback
     const filtered = allProducts.filter(product =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description.toLowerCase().includes(searchTerm.toLowerCase())

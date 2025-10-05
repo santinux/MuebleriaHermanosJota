@@ -3,6 +3,7 @@ const cors = require('cors');
 const logger = require('./middleware/logger');
 const productRoutes = require('./routes/productRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const { loadContactsFromFile } = require('./controllers/contactController');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -28,6 +29,9 @@ app.use((err, req, res, next) => {
         message: err.message || 'Ha ocurrido un error en el servidor'
     });
 });
+
+// Cargar datos al iniciar el servidor
+loadContactsFromFile();
 
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
