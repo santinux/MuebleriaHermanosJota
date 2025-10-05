@@ -2059,6 +2059,39 @@ main {
     position: relative;
 }
 
+/* Custom scrollbar for payment modal */
+.payment-modal::-webkit-scrollbar {
+    width: 12px;
+}
+
+.payment-modal::-webkit-scrollbar-track {
+    background: var(--background-light);
+    border-radius: 6px;
+    margin: 4px 0;
+}
+
+.payment-modal::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 6px;
+    border: 2px solid var(--background-light);
+    transition: var(--transition);
+}
+
+.payment-modal::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    border-color: var(--primary-color);
+}
+
+.payment-modal::-webkit-scrollbar-thumb:active {
+    background: var(--primary-color);
+}
+
+/* Firefox scrollbar */
+.payment-modal {
+    scrollbar-width: thick;
+    scrollbar-color: var(--primary-color) var(--background-light);
+}
+
 .payment-modal-header {
     display: flex;
     justify-content: space-between;
@@ -2382,6 +2415,20 @@ main {
     
     .payment-modal-actions {
         flex-direction: column;
+    }
+    
+    /* Custom scrollbar for mobile */
+    .payment-modal::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .payment-modal::-webkit-scrollbar-thumb {
+        border: 1px solid var(--background-light);
+    }
+    
+    /* Firefox scrollbar mobile */
+    .payment-modal {
+        scrollbar-width: thin;
     }
     
     /* Hero Section Mobile */
