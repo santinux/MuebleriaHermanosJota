@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import PaymentModal from "./PaymentModal";
 
 const CartDropdown = ({ cart, onUpdateCart }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   // Formatear precio
   const formatPrice = (price) => {
@@ -52,10 +54,13 @@ const CartDropdown = ({ cart, onUpdateCart }) => {
       alert("Tu carrito está vacío");
       return;
     }
-    alert(
-      `Procediendo al pago por un total de ${formatPrice(getTotalPrice())}`
-    );
     setIsOpen(false);
+    setIsPaymentModalOpen(true);
+  };
+
+  // Limpiar carrito después del pago
+  const handlePaymentSuccess = () => {
+    onUpdateCart([]);
   };
 
   // Cerrar dropdown al hacer clic fuera
@@ -73,7 +78,7 @@ const CartDropdown = ({ cart, onUpdateCart }) => {
   }, [isOpen]);
 
   return (
-    <div className="cart-dropdown-container">
+    <div className={`cart-dropdown-container ${isOpen ? "open" : ""}`}>
       <div
         className="cart-icon"
         onClick={() => setIsOpen(!isOpen)}
@@ -152,6 +157,14 @@ const CartDropdown = ({ cart, onUpdateCart }) => {
           </div>
         )}
       </div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        cart={cart}
+        onClearCart={handlePaymentSuccess}
+      />
     </div>
   );
 };

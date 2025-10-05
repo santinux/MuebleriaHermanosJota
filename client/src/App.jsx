@@ -42,14 +42,21 @@ function App() {
     localStorage.setItem("reactShoppingCart", JSON.stringify(cart));
   }, [cart]);
 
+  // Hacer scroll hacia arriba cuando cambie la página
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [actualPage]);
+
   const handleSelectProduct = (product) => {
     setSelectedProduct(product);
     setActualPage("product_detail");
+    // El useEffect se encarga del scroll automáticamente
   };
 
   const handleExitProductDetail = (actualPage) => {
     setSelectedProduct(null);
     setActualPage(actualPage);
+    // El useEffect se encarga del scroll automáticamente
   };
   const handleAddToCart = (product) => {
     setCart((prevCart) => {
@@ -109,6 +116,8 @@ function App() {
             product={selectedProduct}
             onExit={handleExitProductDetail}
             onAddToCart={handleAddToCart}
+            allProducts={products}
+            onProductClick={handleSelectProduct}
           />
         )}
       </main>

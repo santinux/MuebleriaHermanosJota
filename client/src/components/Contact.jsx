@@ -10,6 +10,8 @@ function Contact() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cartCount] = useState(0);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validarFormulario = (nombre, email, mensaje) => {
     if (nombre.trim().length < 2) return 'Poné un nombre más largo';
@@ -21,16 +23,22 @@ function Contact() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Limpiar error cuando el usuario empiece a escribir
+    if (error) setError('');
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const { name, email, message } = formData;
-    const error = validarFormulario(name, email, message);
-    if (error) {
-      alert(error);
+    const validationError = validarFormulario(name, email, message);
+    
+    if (validationError) {
+      setError(validationError);
       return;
     }
+
+    setIsSubmitting(true);
+    setError('');
 
     fetch('http://localhost:3000/api/contacto', {
       method: 'POST',
@@ -42,13 +50,17 @@ function Contact() {
         console.log('Respuesta del backend:', data);
         if (data.success) {
           setShowSuccess(true);
+          setError('');
         } else {
-          alert(data.message || 'Hubo un error al enviar el mensaje');
+          setError(data.message || 'Hubo un error al enviar el mensaje');
         }
       })
       .catch(err => {
         console.error('Error al enviar el formulario:', err);
-        alert('No se pudo enviar el mensaje. Intentá más tarde.');
+        setError('No se pudo enviar el mensaje. Intentá más tarde.');
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
   };
 
@@ -94,19 +106,57 @@ function Contact() {
                 {!showSuccess ? (
                   <form onSubmit={handleSubmit}>
                     <h2>Envíanos un Mensaje</h2>
+                    
+                    {error && (
+                      <div className="error-message">
+                        <span className="error-icon">⚠️</span>
+                        <span>{error}</span>
+                      </div>
+                    )}
+                    
                     <div className="form-group">
                       <label htmlFor="name">Nombre *</label>
-                      <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required />
+                      <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        value={formData.name} 
+                        onChange={handleInputChange} 
+                        className={error && formData.name.length < 2 ? 'error' : ''}
+                        required 
+                      />
                     </div>
                     <div className="form-group">
                       <label htmlFor="email">Email *</label>
-                      <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} required />
+                      <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        value={formData.email} 
+                        onChange={handleInputChange} 
+                        className={error && (!formData.email.includes('@') || !formData.email.includes('.')) ? 'error' : ''}
+                        required 
+                      />
                     </div>
                     <div className="form-group">
                       <label htmlFor="message">Mensaje *</label>
-                      <textarea id="message" name="message" rows="5" value={formData.message} onChange={handleInputChange} required />
+                      <textarea 
+                        id="message" 
+                        name="message" 
+                        rows="5" 
+                        value={formData.message} 
+                        onChange={handleInputChange} 
+                        className={error && formData.message.length < 10 ? 'error' : ''}
+                        required 
+                      />
                     </div>
-                    <button type="submit" className="btn btn-primary">Enviar Mensaje</button>
+                    <button 
+                      type="submit" 
+                      className="btn btn-primary"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Enviando...' : 'Enviar Mensaje'}
+                    </button>
                   </form>
                 ) : (
                   <div className="success-message show">
