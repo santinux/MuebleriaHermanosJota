@@ -1,16 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import ProductCard from "../components/ProductsCard.jsx";
 import { getAllProducts, searchProducts } from "../../services/productServices.js";
+import Loading from "../components/Loading.jsx";
+import Error from "../components/Error.jsx";
+import { useAppContext } from "../contexts/AppContext.jsx";
 
-const Products = ({ onProductClick, onAddToCart }) => {
+const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isTipsVisible, setIsTipsVisible] = useState(false);
-  const [fetchError, setFetchError] = useState(false);
   const tipsRef = useRef(null);
 
+  const { setCurrentPage, error, setError, loading, setLoading } = useAppContext();
 
   // Función para manejar la búsqueda
   const handleSearch = (e) => {
@@ -52,14 +54,16 @@ const Products = ({ onProductClick, onAddToCart }) => {
   };
 
   useEffect(() => {
+    setLoading(true);
+    setError(false);
     getAllProducts().then(data => {
       setAllProducts(data);
       setFilteredProducts(data);
-      setLoading(false);
     }).catch(error => {
-      setLoading(false);
-      setFetchError(true);
+      setError(true);
       console.error('Error loading products:', error);
+    }).finally(() => {
+      setLoading(false);
     });
   }, []);
 
@@ -110,10 +114,7 @@ const Products = ({ onProductClick, onAddToCart }) => {
 
           <div className="products-container">
             {loading ? (
-              <div className="loading" id="loading">
-                <div className="loading-spinner"></div>
-                <p>Cargando catálogo de productos...</p>
-              </div>
+              <Loading message="Cargando catálogo de productos..." />
             ) : (
               <div className="products-grid" id="products-grid">
                 {filteredProducts.length > 0 ? (
@@ -121,20 +122,10 @@ const Products = ({ onProductClick, onAddToCart }) => {
                     <ProductCard
                       key={product.id}
                       product={product}
-                      onProductClick={onProductClick}
-                      onAddToCart={onAddToCart}
                     />
                   ))
-                ) : (<div style={{ textAlign: "center", color: "var(--text-medium)" }}>
-                  {fetchError ?
-                    (
-                      <p>Error al cargar los productos. Por favor, intentá nuevamente más tarde.</p>
-                    )
-                    : (
-                      <p>No se encontraron productos que coincidan con tu búsqueda.</p>
-                    )
-                  }
-                </div>
+                ) : (
+                  <Error message={error ? "Error al cargar los productos. Por favor, intentá nuevamente más tarde." : "No se encontraron productos que coincidan con tu búsqueda."} />
                 )}
               </div>
             )}

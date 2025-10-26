@@ -4,16 +4,23 @@ import { getFeaturedProducts } from '../../services/productServices';
 import '../styles/App.css'
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppContext.jsx';
+import Loading from '../components/Loading.jsx';
+import Error from '../components/Error.jsx';
 
 
 const Home = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
-    const { setCurrentPage } = useAppContext();
+    const { setCurrentPage, loading, setLoading, error, setError } = useAppContext();
     useEffect(() => {
+        setLoading(true);
+        setError(false);
         getFeaturedProducts().then(products => {
             setFeaturedProducts(products);
         }).catch(error => {
+            setError(true);
             console.error('Error loading featured products:', error);
+        }).finally(() => {
+            setLoading(false);
         });
     }, []);
 
@@ -43,7 +50,9 @@ const Home = () => {
                     <h2 className="section-title">Productos Destacados</h2>
                     <div className="products-grid" id="featured-products-grid">
                         {/* Productos destacados se cargarán aquí dinámicamente */}
-                        {featuredProducts.length > 0 ? 
+                        {loading && <Loading message="Cargando productos destacados..." />}
+                        {error && <Error message="Error al cargar los productos destacados. Por favor, intentá nuevamente más tarde." />}
+                        {featuredProducts && featuredProducts.length > 0 &&
                             featuredProducts.slice(0, 6).map(product => (
                                 <Link className="product-card" to={`/products/${product.id}`} key={product.id} onClick={() => setCurrentPage("products")}>
                                     <div className="product-image">
@@ -55,15 +64,8 @@ const Home = () => {
                                         <span className="product-price">{formatPrice(product.price)}</span>
                                     </div>
                                 </Link>
-                                
-                                
-                            )) : (
-                            <div className="loading" id="loading">
-                                <div className="loading-spinner"></div>
-                                <p>Cargando productos destacados...</p>
-                            </div>
-                            
-                        )}
+                            ))
+                        }
                     </div>
                     <div className="see-more-container">
                         <Link to="/products" onClick={() => setCurrentPage("products")} className="see-more-btn">

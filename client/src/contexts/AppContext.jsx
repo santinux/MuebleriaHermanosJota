@@ -10,6 +10,8 @@ export default function AppProvider({ children }) {
     // Estado de navegación
     const [currentPage, setCurrentPage] = useState("home");
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
 
     // Carrito
     const [cart, setCart] = useState(() => {
@@ -99,6 +101,12 @@ export default function AppProvider({ children }) {
         clearCart,
         cartCount,
         cartTotal,
+
+        // Estado general
+        loading,
+        setLoading,
+        error,
+        setError,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

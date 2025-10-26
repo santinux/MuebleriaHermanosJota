@@ -1,27 +1,32 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductsCard";
 import "../styles/App.css";
 import { getProductById } from "../../services/productServices";
 import { Link, useParams } from "react-router-dom";
 import { useAppContext } from "../contexts/AppContext.jsx";
+import Loading from "../components/Loading.jsx";
+import Error from "../components/Error.jsx";
 
 const ProductDetail = ({ allProducts, onProductClick }) => {
   const [product, setProduct] = useState(null);
-  const [error, setError] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  
-  const {id} = useParams();
-  const { setCurrentPage,  addToCart} = useAppContext();
-  
+
+  const { id } = useParams();
+  const { setCurrentPage, addToCart, error, setError, loading, setLoading } = useAppContext();
+
   // Cargar detalles del producto cuando cambie id
   useEffect(() => {
+    setLoading(true);
+    setError(false);
     getProductById(id).then(data => {
       setProduct(data);
       const relatedProducts = getRelatedProducts();
       setRelatedProducts(relatedProducts);
     }).catch(error => {
       console.error('Error loading product details:', error);
-      setError(error);
+      setError(true);
+    }).finally(() => {
+      setLoading(false);
     });
 
   }, [id]);
@@ -46,14 +51,13 @@ const ProductDetail = ({ allProducts, onProductClick }) => {
     <>
       <section className="product-detail">
         <div className="container">
-          {product && (
-            <>
-              <nav className="breadcrumb">
-                <Link to="/" onClick={() => setCurrentPage("home")}>Inicio</Link>
-                <Link to="/products" onClick={() => setCurrentPage("products")}>Productos</Link>
-                <span id="breadcrumb-product">{product.name}</span>
-              </nav>
-
+          <>
+            <nav className="breadcrumb">
+              <Link to="/" onClick={() => setCurrentPage("home")}>Inicio</Link>
+              <Link to="/products" onClick={() => setCurrentPage("products")}>Productos</Link>
+              {!error && product && <span id="breadcrumb-product">{product.name}</span>}
+            </nav>
+            {product && (
               <div className="product-container">
                 <div className="product-detail-content">
                   <div className="product-detail-image">
@@ -91,8 +95,9 @@ const ProductDetail = ({ allProducts, onProductClick }) => {
                   </div>
                 </div>
               </div>
-            </>
-          )}
+            )}
+          </>
+
         </div>
       </section>
 
@@ -115,11 +120,9 @@ const ProductDetail = ({ allProducts, onProductClick }) => {
         </section>
       )}
       {error && (
-        <div style={{ textAlign: "center", color: "var(--text-medium)" }}>
-          <p>{error.message}</p>
-          <p>Error al cargar los detalles del producto. Por favor, inténtelo de nuevo más tarde.</p>
-        </div>
+        <Error message="Error al cargar los detalles del producto. Por favor, inténtelo de nuevo más tarde." />
       )}
+      {loading && <Loading message="Cargando detalles del producto..." />}
     </>
   );
 };
