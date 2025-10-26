@@ -2,14 +2,16 @@ import {useEffect, useState} from "react";
 import ProductCard from "../components/ProductsCard";
 import "../styles/App.css";
 import { getProductById } from "../../services/productServices";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useAppContext } from "../contexts/AppContext.jsx";
 
-const ProductDetail = ({ onExit, onAddToCart, allProducts, onProductClick }) => {
+const ProductDetail = ({ allProducts, onProductClick }) => {
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   
   const {id} = useParams();
+  const { setCurrentPage,  addToCart} = useAppContext();
   
   // Cargar detalles del producto cuando cambie id
   useEffect(() => {
@@ -47,8 +49,8 @@ const ProductDetail = ({ onExit, onAddToCart, allProducts, onProductClick }) => 
           {product && (
             <>
               <nav className="breadcrumb">
-                <a onClick={() => onExit("home")}>Inicio</a>
-                <a onClick={() => onExit("products")}>Productos</a>
+                <Link to="/" onClick={() => setCurrentPage("home")}>Inicio</Link>
+                <Link to="/products" onClick={() => setCurrentPage("products")}>Productos</Link>
                 <span id="breadcrumb-product">{product.name}</span>
               </nav>
 
@@ -82,7 +84,7 @@ const ProductDetail = ({ onExit, onAddToCart, allProducts, onProductClick }) => 
 
                     <button
                       className="btn btn-primary add-to-cart-btn"
-                      onClick={() => onAddToCart(product)}
+                      onClick={() => addToCart(product)}
                     >
                       Añadir al Carrito
                     </button>

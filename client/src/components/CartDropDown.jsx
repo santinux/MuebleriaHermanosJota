@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
 import PaymentModal from "./PaymentModal";
+import { useAppContext } from "../contexts/AppContext.jsx";
 
-const CartDropdown = ({ cart, onUpdateCart }) => {
+const CartDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const { cart,
+        setItemQty,
+        removeFromCart,
+        clearCart,
+        cartCount,
+        cartTotal
+    } = useAppContext();
 
   // Formatear precio
   const formatPrice = (price) => {
@@ -14,38 +22,9 @@ const CartDropdown = ({ cart, onUpdateCart }) => {
     }).format(price);
   };
 
-  // Obtener total de items
-  const getTotalItems = () => {
-    return cart.reduce((total, item) => total + item.quantity, 0);
-  };
-
   // Obtener total del carrito
   const getTotalPrice = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
-
-  // Actualizar cantidad de un producto
-  const updateQuantity = (productId, newQuantity) => {
-    if (newQuantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-
-    const updatedCart = cart.map((item) =>
-      item.id === productId ? { ...item, quantity: newQuantity } : item
-    );
-    onUpdateCart(updatedCart);
-  };
-
-  // Remover producto del carrito
-  const removeFromCart = (productId) => {
-    const updatedCart = cart.filter((item) => item.id !== productId);
-    onUpdateCart(updatedCart);
-  };
-
-  // Limpiar carrito
-  const clearCart = () => {
-    onUpdateCart([]);
   };
 
   // Proceder al checkout
@@ -60,7 +39,7 @@ const CartDropdown = ({ cart, onUpdateCart }) => {
 
   // Limpiar carrito después del pago
   const handlePaymentSuccess = () => {
-    onUpdateCart([]);
+    clearCart();
   };
 
   // Cerrar dropdown al hacer clic fuera
@@ -84,12 +63,12 @@ const CartDropdown = ({ cart, onUpdateCart }) => {
         onClick={() => setIsOpen(!isOpen)}
         style={{ cursor: "pointer" }}
       >
-        <span className="cart-count">{getTotalItems()}</span>🛒
+        <span className="cart-count">{cartCount}</span>🛒
       </div>
 
       <div className={`cart-dropdown ${isOpen ? "show" : ""}`}>
         <div className="cart-dropdown-header">
-          <h3 className="cart-dropdown-title">Carrito ({getTotalItems()})</h3>
+          <h3 className="cart-dropdown-title">Carrito ({cartCount})</h3>
           <button
             className="cart-dropdown-close"
             onClick={() => setIsOpen(false)}
@@ -118,7 +97,7 @@ const CartDropdown = ({ cart, onUpdateCart }) => {
                   <div className="cart-item-quantity">
                     <button
                       className="cart-item-quantity-btn"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => setItemQty(item.id, item.quantity - 1)}
                     >
                       -
                     </button>
@@ -127,7 +106,7 @@ const CartDropdown = ({ cart, onUpdateCart }) => {
                     </span>
                     <button
                       className="cart-item-quantity-btn"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => setItemQty(item.id, item.quantity + 1)}
                     >
                       +
                     </button>

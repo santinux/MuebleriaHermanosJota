@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react'
 import { getFeaturedProducts } from '../../services/productServices';
 import '../styles/App.css'
 import { Link } from 'react-router-dom';
+import { useAppContext } from '../contexts/AppContext.jsx';
 
 
-const Home = ({ handleSelectProduct }) => {
+const Home = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
-
-    
+    const { setCurrentPage } = useAppContext();
     useEffect(() => {
         getFeaturedProducts().then(products => {
             setFeaturedProducts(products);
@@ -31,7 +31,7 @@ const Home = ({ handleSelectProduct }) => {
                     <div className="hero-text">
                         <h2>Muebles Artesanales de Calidad Superior</h2>
                         <p>Más de 30 años creando piezas únicas que combinan tradición artesanal con diseño moderno. Cada mueble cuenta una historia de dedicación y maestría.</p>
-                        <button onClick={() => setActualPage('products')} className="btn btn-primary">Ver Catálogo</button>
+                        <Link to="/products" onClick={() => setCurrentPage("products")} className="btn btn-primary">Ver Catálogo</Link>
                     </div>
                     <div className="hero-image">
                         <img src="https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Muebles artesanales de madera" />
@@ -45,7 +45,7 @@ const Home = ({ handleSelectProduct }) => {
                         {/* Productos destacados se cargarán aquí dinámicamente */}
                         {featuredProducts.length > 0 ? 
                             featuredProducts.slice(0, 6).map(product => (
-                                <a className="product-card" key={product.id} onClick={() => handleSelectProduct(product.id)}>
+                                <Link className="product-card" to={`/products/${product.id}`} key={product.id} onClick={() => setCurrentPage("products")}>
                                     <div className="product-image">
                                         <img src={product.image} alt={product.name} />
                                     </div>
@@ -54,7 +54,7 @@ const Home = ({ handleSelectProduct }) => {
                                         <p className="product-description">{product.description}</p>
                                         <span className="product-price">{formatPrice(product.price)}</span>
                                     </div>
-                                </a>
+                                </Link>
                                 
                                 
                             )) : (
@@ -66,7 +66,7 @@ const Home = ({ handleSelectProduct }) => {
                         )}
                     </div>
                     <div className="see-more-container">
-                        <Link to="/products" className="see-more-btn">
+                        <Link to="/products" onClick={() => setCurrentPage("products")} className="see-more-btn">
                             Ver más
                         </Link>
                     </div>

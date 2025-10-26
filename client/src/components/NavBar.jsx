@@ -2,22 +2,24 @@ import { useState, useEffect } from "react";
 import CartDropdown from "./CartDropDown";
 import { Link } from "react-router-dom";
 import "../styles/App.css";
+import { useAppContext } from "../contexts/AppContext.jsx";
 
-const NavBar = ({ cart, onUpdateCart }) => {
+const NavBar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [actualPage, setActualPage] = useState("home");
+
+    const { currentPage, setCurrentPage, cart, addToCart, cartCount } = useAppContext();
 
     // Hacer scroll hacia arriba cuando cambie la página
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, [actualPage]);
+    }, [currentPage]);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
     const handleChangePage = (page) => {
-        setActualPage(page);
+        setCurrentPage(page);
         setIsMenuOpen(false); // Cerrar el menú al cambiar de página
     };
 
@@ -25,7 +27,7 @@ const NavBar = ({ cart, onUpdateCart }) => {
         <nav className="nav">
             <div className="nav-container">
                 {/* Logo y Titulo */}
-                <div className="nav-logo" onClick={() => setActualPage("home")}>
+                <div className="nav-logo" onClick={() => setCurrentPage("home")}>
                     <h1>Mueblería</h1>
                     <span>Hermanos Jota</span>
                 </div>
@@ -36,7 +38,7 @@ const NavBar = ({ cart, onUpdateCart }) => {
                         <Link
                             to="/"
                             onClick={() => handleChangePage("home")}
-                            className={actualPage === "home" ? "nav-link active" : "nav-link"}
+                            className={currentPage === "home" ? "nav-link active" : "nav-link"}
                         >
                             Inicio
                         </Link>
@@ -45,7 +47,7 @@ const NavBar = ({ cart, onUpdateCart }) => {
                         <Link
                             to="/products"
                             onClick={() => handleChangePage("products")}
-                            className={actualPage === "products" ? "nav-link active" : "nav-link"}
+                            className={currentPage === "products" ? "nav-link active" : "nav-link"}
                         >
                             Productos
                         </Link>
@@ -54,7 +56,7 @@ const NavBar = ({ cart, onUpdateCart }) => {
                         <Link
                             to="/contact"
                             onClick={() => handleChangePage("contact")}
-                            className={actualPage === "contact" ? "nav-link active" : "nav-link"}
+                            className={currentPage === "contact" ? "nav-link active" : "nav-link"}
                         >
                             Contacto
                         </Link>
@@ -63,7 +65,7 @@ const NavBar = ({ cart, onUpdateCart }) => {
 
                 {/* Carrito de Compras */}
                 <div className="nav-cart">
-                    <CartDropdown cart={cart} onUpdateCart={onUpdateCart} />
+                    <CartDropdown cart={cart} onUpdateCart={addToCart} />
                 </div>
 
                 {/* Hamburger Menu */}
