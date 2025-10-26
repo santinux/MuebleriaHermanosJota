@@ -1,12 +1,28 @@
-import {useEffect, useState } from "react";
-import ProductCard from "./ProductsCard";
+import {useEffect, useState} from "react";
+import ProductCard from "../components/ProductsCard";
 import "../styles/App.css";
 import { getProductById } from "../../services/productServices";
+import { useParams } from "react-router-dom";
 
-const ProductDetail = ({ productId, onExit, onAddToCart, allProducts, onProductClick }) => {
+const ProductDetail = ({ onExit, onAddToCart, allProducts, onProductClick }) => {
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  
+  const {id} = useParams();
+  
+  // Cargar detalles del producto cuando cambie id
+  useEffect(() => {
+    getProductById(id).then(data => {
+      setProduct(data);
+      const relatedProducts = getRelatedProducts();
+      setRelatedProducts(relatedProducts);
+    }).catch(error => {
+      console.error('Error loading product details:', error);
+      setError(error);
+    });
+
+  }, [id]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("es-AR", {
@@ -23,18 +39,6 @@ const ProductDetail = ({ productId, onExit, onAddToCart, allProducts, onProductC
       .slice(0, 4); // Mostrar máximo 4 productos relacionados
   };
 
-  // Cargar detalles del producto cuando cambie productId
-  useEffect(() => {
-    getProductById(productId).then(data => {
-      setProduct(data);
-      const relatedProducts = getRelatedProducts();
-      setRelatedProducts(relatedProducts);
-    }).catch(error => {
-      console.error('Error loading product details:', error);
-      setError(error);
-    });
-
-  }, [productId]);
 
   return (
     <>

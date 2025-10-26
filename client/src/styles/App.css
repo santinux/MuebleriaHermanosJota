@@ -449,6 +449,11 @@ main {
     position: relative;
 }
 
+.product-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 .product-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
