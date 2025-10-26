@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import NavBar from "./components/NavBar";
-import Home from "./components/Home";
-import Footer from "./components/Footer";
-import Contact from "./components/Contact";
-import ProductDetail from "./components/ProductDetail";
-import Products from "./components/Products";
+import NavBar from "./components/NavBar.jsx";
+import Home from "./pages/Home.jsx";
+import Products from "./pages/Products.jsx";
+import ProductDetail from "./pages/ProductDetail.jsx";
+import Contact from "./pages/Contact.jsx";
+import Footer from "./components/Footer.jsx";
 import { getFeaturedProducts } from "../services/productServices.js";
+import { Routes, Route } from "react-router-dom";
 import "./styles/App.css";
 
 function App() {
-  const [actualPage, setActualPage] = useState("home"); //pagina para renderizar
   const [selectedProduct, setSelectedProduct] = useState(null); // producto seleccionado para ver detalle
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
@@ -39,20 +39,15 @@ function App() {
     localStorage.setItem("reactShoppingCart", JSON.stringify(cart));
   }, [cart]);
 
-  // Hacer scroll hacia arriba cuando cambie la página
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [actualPage]);
-
   const handleSelectProduct = (productId) => {
     setSelectedProduct(productId);
-    setActualPage("product_detail");
+ 
     // El useEffect se encarga del scroll automáticamente
   };
 
   const handleExitProductDetail = (actualPage) => {
     setSelectedProduct(null);
-    setActualPage(actualPage);
+
     // El useEffect se encarga del scroll automáticamente
   };
   const handleAddToCart = (product) => {
@@ -79,38 +74,16 @@ function App() {
         <NavBar
           cart={cart}
           onUpdateCart={handleUpdateCart}
-          actualPage={actualPage}
-          setActualPage={setActualPage}
           cartItemCount={cart.reduce((acc, item) => acc + item.quantity, 0)}
         />
       </header>
       <main>
-        {actualPage === "home" && (
-          <Home
-            setActualPage={setActualPage}
-            handleSelectProduct={handleSelectProduct}
-          />
-        )}
-
-        {actualPage === "products" && (
-          <Products
-            products={products}
-            onProductClick={handleSelectProduct}
-            onAddToCart={handleAddToCart}
-          />
-        )}
-
-        {actualPage === 'contact' && <Contact />}
-
-        {actualPage === "product_detail" && (
-          <ProductDetail
-            productId={selectedProduct}
-            onExit={handleExitProductDetail}
-            onAddToCart={handleAddToCart}
-            allProducts={products}
-            onProductClick={handleSelectProduct}
-          />
-        )}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
       </main>
       <footer className="footer">
         <Footer />

@@ -1,17 +1,24 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import CartDropdown from "./CartDropDown";
+import { Link } from "react-router-dom";
 import "../styles/App.css";
 
-const NavBar = ({ setActualPage, actualPage, cart, onUpdateCart }) => {
+const NavBar = ({ cart, onUpdateCart }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [actualPage, setActualPage] = useState("home");
+
+    // Hacer scroll hacia arriba cuando cambie la página
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [actualPage]);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const handleNavClick = (page) => {
+    const handleChangePage = (page) => {
         setActualPage(page);
-        setIsMenuOpen(false);
+        setIsMenuOpen(false); // Cerrar el menú al cambiar de página
     };
 
     return (
@@ -26,40 +33,31 @@ const NavBar = ({ setActualPage, actualPage, cart, onUpdateCart }) => {
                 {/* Enlaces de Navegación */}
                 <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
                     <li>
-                        <a
-                            href="#"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleNavClick("home");
-                            }}
+                        <Link
+                            to="/"
+                            onClick={() => handleChangePage("home")}
                             className={actualPage === "home" ? "nav-link active" : "nav-link"}
                         >
                             Inicio
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a
-                            href="#"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleNavClick("products");
-                            }}
+                        <Link
+                            to="/products"
+                            onClick={() => handleChangePage("products")}
                             className={actualPage === "products" ? "nav-link active" : "nav-link"}
                         >
                             Productos
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a
-                            href="#"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleNavClick("contact");
-                            }}
+                        <Link
+                            to="/contact"
+                            onClick={() => handleChangePage("contact")}
                             className={actualPage === "contact" ? "nav-link active" : "nav-link"}
                         >
                             Contacto
-                        </a>
+                        </Link>
                     </li>
                 </ul>
 

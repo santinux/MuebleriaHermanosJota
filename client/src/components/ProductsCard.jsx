@@ -1,6 +1,6 @@
-import React from "react";
+import { Link } from "react-router-dom";
 
-const ProductCard = ({ product, onProductClick}) => {
+const ProductCard = ({ product}) => {
   const formatPrice = (price) => {
     return new Intl.NumberFormat("es-AR", {
       style: "currency",
@@ -11,9 +11,9 @@ const ProductCard = ({ product, onProductClick}) => {
 
   return (
     <div className="product-card">
-      <div
+      <Link
+        to={`/products/${product.id}`}
         className="product-link"
-        onClick={() => onProductClick(product.id)}
         style={{ cursor: "pointer" }}
       >
         <div className="product-image">
@@ -24,7 +24,7 @@ const ProductCard = ({ product, onProductClick}) => {
           <p className="product-description">{product.description}</p>
           <span className="product-price">{formatPrice(product.price)}</span>
         </div>
-      </div>
+      </Link>
     </div>
   );
 };
