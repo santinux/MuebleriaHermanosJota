@@ -8,8 +8,6 @@ function Contact() {
     message: ''
   });
   const [showSuccess, setShowSuccess] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cartCount] = useState(0);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
