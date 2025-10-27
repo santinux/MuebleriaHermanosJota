@@ -24,7 +24,7 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
   };
 
   const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cart.reduce((total, item) => total + (item.precio || item.price || 0) * item.quantity, 0);
   };
 
   const handleInputChange = (e) => {
@@ -248,11 +248,11 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
                 <div className="order-items">
                   {cart.map((item) => (
                     <div key={item.id} className="order-item">
-                      <img src={item.image} alt={item.name} />
+                      <img src={item.imagenUrl || item.image} alt={item.nombre || item.name} />
                       <div className="item-details">
-                        <h5>{item.name}</h5>
+                        <h5>{item.nombre || item.name}</h5>
                         <p>Cantidad: {item.quantity}</p>
-                        <p className="item-price">{formatPrice(item.price * item.quantity)}</p>
+                        <p className="item-price">{formatPrice((item.precio || item.price || 0) * item.quantity)}</p>
                       </div>
                     </div>
                   ))}

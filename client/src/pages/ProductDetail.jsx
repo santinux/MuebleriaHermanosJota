@@ -28,12 +28,10 @@ const ProductDetail = () => {
   useEffect(() => {
     setLoading(true);
     setError(false);
-    console.log('🔄 Cargando detalles del producto ID:', id);
     getProductById(id).then(data => {
-      console.log('✅ Producto cargado:', data);
       setProduct(data);
     }).catch(error => {
-      console.error('❌ Error loading product details:', error);
+      console.error('Error loading product details:', error);
       setError(true);
     }).finally(() => {
       setLoading(false);

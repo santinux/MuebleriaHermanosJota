@@ -24,7 +24,7 @@ const CartDropdown = () => {
 
   // Obtener total del carrito
   const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cart.reduce((total, item) => total + (item.precio || item.price || 0) * item.quantity, 0);
   };
 
   // Proceder al checkout
@@ -87,13 +87,13 @@ const CartDropdown = () => {
             cart.map((item) => (
               <div key={item.id} className="cart-item">
                 <img
-                  src={item.image}
-                  alt={item.name}
+                  src={item.imagenUrl || item.image}
+                  alt={item.nombre || item.name}
                   className="cart-item-image"
                 />
                 <div className="cart-item-details">
-                  <p className="cart-item-name">{item.name}</p>
-                  <p className="cart-item-price">{formatPrice(item.price)}</p>
+                  <p className="cart-item-name">{item.nombre || item.name}</p>
+                  <p className="cart-item-price">{formatPrice(item.precio || item.price)}</p>
                   <div className="cart-item-quantity">
                     <button
                       className="cart-item-quantity-btn"
