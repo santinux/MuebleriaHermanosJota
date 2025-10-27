@@ -6,7 +6,7 @@ import ProductDetail from "./pages/ProductDetail.jsx";
 import Contact from "./pages/Contact.jsx";
 import Footer from "./components/Footer.jsx";
 import { NotFound } from "./pages/NotFound.jsx";
-import { getFeaturedProducts } from "../services/productServices.js";
+import { getFeaturedProducts } from "./services/productServices.js";
 import { Routes, Route } from "react-router-dom";
 import "./styles/App.css";
 

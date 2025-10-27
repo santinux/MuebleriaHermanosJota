@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react'
-import { getFeaturedProducts } from '../../services/productServices';
+import { getFeaturedProducts } from '../services/productServices';
 import '../styles/App.css'
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppContext.jsx';

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductsCard";
 import "../styles/App.css";
-import { getProductById } from "../../services/productServices";
+import { getProductById } from "../services/productServices";
 import { Link, useParams } from "react-router-dom";
 import { useAppContext } from "../contexts/AppContext.jsx";
 import Loading from "../components/Loading.jsx";

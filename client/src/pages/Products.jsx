@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import ProductCard from "../components/ProductsCard.jsx";
-import { getAllProducts, searchProducts } from "../../services/productServices.js";
+import { getAllProducts, searchProducts } from "../services/productServices.js";
 import Loading from "../components/Loading.jsx";
 import Error from "../components/Error.jsx";
 import { useAppContext } from "../contexts/AppContext.jsx";
