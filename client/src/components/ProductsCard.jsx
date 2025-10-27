@@ -17,12 +17,12 @@ const ProductCard = ({ product}) => {
         style={{ cursor: "pointer" }}
       >
         <div className="product-image">
-          <img src={product.image} alt={product.name} />
+          <img src={product.imagenUrl || product.image} alt={product.nombre || product.name} />
         </div>
         <div className="product-info">
-          <h3 className="product-name">{product.name}</h3>
-          <p className="product-description">{product.description}</p>
-          <span className="product-price">{formatPrice(product.price)}</span>
+          <h3 className="product-name">{product.nombre || product.name}</h3>
+          <p className="product-description">{product.descripcion || product.description}</p>
+          <span className="product-price">{formatPrice(product.precio || product.price)}</span>
         </div>
       </Link>
     </div>

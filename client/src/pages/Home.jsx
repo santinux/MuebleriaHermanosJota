@@ -14,11 +14,17 @@ const Home = () => {
     useEffect(() => {
         setLoading(true);
         setError(false);
+        console.log('🔄 Cargando productos destacados...');
         getFeaturedProducts().then(products => {
+            console.log('✅ Productos destacados cargados:', products);
+            console.log('📊 Cantidad de productos destacados:', products?.length);
+            if (products && products.length > 0) {
+                console.log('📦 Primer producto destacado:', products[0]);
+            }
             setFeaturedProducts(products);
         }).catch(error => {
             setError(true);
-            console.error('Error loading featured products:', error);
+            console.error('❌ Error loading featured products:', error);
         }).finally(() => {
             setLoading(false);
         });

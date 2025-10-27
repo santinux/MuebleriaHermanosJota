@@ -56,12 +56,18 @@ const Products = () => {
   useEffect(() => {
     setLoading(true);
     setError(false);
+    console.log('🔄 Cargando productos...');
     getAllProducts().then(data => {
+      console.log('✅ Productos cargados:', data);
+      console.log('📊 Cantidad de productos:', data?.length);
+      if (data && data.length > 0) {
+        console.log('📦 Primer producto:', data[0]);
+      }
       setAllProducts(data);
       setFilteredProducts(data);
     }).catch(error => {
       setError(true);
-      console.error('Error loading products:', error);
+      console.error('❌ Error loading products:', error);
     }).finally(() => {
       setLoading(false);
     });
