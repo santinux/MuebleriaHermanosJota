@@ -11,6 +11,10 @@
   ],
   "routes": [
     {
+      "src": "/img/(.*)",
+      "dest": "client/dist/img/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "client/dist/$1"
     }
