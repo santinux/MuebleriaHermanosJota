@@ -18,7 +18,14 @@ const getAllProducts = async (req, res, next) => {
 const getProductById = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const product = await Product.findById(id);
+        
+        // Buscar por ID numérico primero, luego por _id de MongoDB
+        let product = await Product.findOne({ id: parseInt(id) });
+        
+        if (!product) {
+            // Si no se encuentra por ID numérico, intentar por _id de MongoDB
+            product = await Product.findById(id);
+        }
         
         if (!product) {
             const error = new Error('Producto no encontrado');
