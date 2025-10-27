@@ -9,13 +9,30 @@ const connectDB = require('./config/database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Configurar CORS para Render
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' 
+        ? ['https://muebleriahermanosjota.vercel.app', 'https://*.vercel.app', 'https://*.render.com']
+        : true,
+    credentials: true
+}));
+
 app.use(express.json());
 app.use(logger);
 
 // Middleware para resolver rutas
 app.use('/api/productos', productRoutes);
 app.use('/api', contactRoutes);
+
+// Health check endpoint para Render
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        uptime: process.uptime()
+    });
+});
 
 // Middleware para rutas no encontradas (404)
 app.use((req, res, next) => {
@@ -32,19 +49,18 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Conectar a la base de datos solo si no estamos en Vercel
-if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
-    connectDB();
-    // Cargar datos al iniciar el servidor solo en desarrollo
+// Conectar a la base de datos
+connectDB();
+
+// Cargar datos al iniciar el servidor solo en desarrollo
+if (process.env.NODE_ENV !== 'production') {
     loadContactsFromFile();
 }
 
-// Para Vercel, no necesitamos app.listen()
-if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
-    app.listen(PORT, () => {
-        console.log(`Servidor corriendo en http://localhost:${PORT}`);
-    });
-}
+// Iniciar servidor
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en puerto ${PORT}`);
+    console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
+});
 
-// Exportar la app para Vercel
 module.exports = app;
