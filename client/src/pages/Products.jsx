@@ -47,8 +47,8 @@ const Products = () => {
     }
     // Para búsqueda en tiempo real, usar filtrado local como fallback
     const filtered = allProducts.filter(product =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase())
+      (product.nombre || product.name).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.descripcion || product.description).toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredProducts(filtered);
   };

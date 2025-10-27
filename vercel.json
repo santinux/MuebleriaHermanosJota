@@ -7,28 +7,16 @@
       "config": {
         "distDir": "dist"
       }
-    },
-    {
-      "src": "backend/api/index.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "backend/api/index.js"
-    },
     {
       "src": "/(.*)",
       "dest": "client/dist/$1"
     }
   ],
   "env": {
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "backend/api/index.js": {
-      "maxDuration": 30
-    }
+    "NODE_ENV": "production",
+    "VITE_API_URL": "https://muebleriahermanosjota.onrender.com"
   }
 }
