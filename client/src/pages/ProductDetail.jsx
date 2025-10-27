@@ -1,35 +1,55 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductsCard";
 import "../styles/App.css";
-import { getProductById } from "../services/productServices";
+import { getProductById, getAllProducts } from "../services/productServices";
 import { Link, useParams } from "react-router-dom";
 import { useAppContext } from "../contexts/AppContext.jsx";
 import Loading from "../components/Loading.jsx";
 import Error from "../components/Error.jsx";
 
-const ProductDetail = ({ allProducts, onProductClick }) => {
+const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
 
   const { id } = useParams();
   const { setCurrentPage, addToCart, error, setError, loading, setLoading } = useAppContext();
+
+  // Cargar todos los productos para productos relacionados
+  useEffect(() => {
+    getAllProducts().then(data => {
+      setAllProducts(data);
+    }).catch(error => {
+      console.error('Error loading all products:', error);
+    });
+  }, []);
 
   // Cargar detalles del producto cuando cambie id
   useEffect(() => {
     setLoading(true);
     setError(false);
+    console.log('🔄 Cargando detalles del producto ID:', id);
     getProductById(id).then(data => {
+      console.log('✅ Producto cargado:', data);
       setProduct(data);
-      const relatedProducts = getRelatedProducts();
-      setRelatedProducts(relatedProducts);
     }).catch(error => {
-      console.error('Error loading product details:', error);
+      console.error('❌ Error loading product details:', error);
       setError(true);
     }).finally(() => {
       setLoading(false);
     });
 
   }, [id]);
+
+  // Actualizar productos relacionados cuando cambie el producto o allProducts
+  useEffect(() => {
+    if (product && allProducts.length > 0) {
+      const related = allProducts
+        .filter(p => p.id !== product.id)
+        .slice(0, 4);
+      setRelatedProducts(related);
+    }
+  }, [product, allProducts]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("es-AR", {
@@ -38,13 +58,6 @@ const ProductDetail = ({ allProducts, onProductClick }) => {
     }).format(price);
   };
 
-  // Obtener productos relacionados (excluyendo el producto actual)
-  const getRelatedProducts = () => {
-    if (!allProducts || !product) return [];
-    return allProducts
-      .filter(p => p.id !== product.id)
-      .slice(0, 4); // Mostrar máximo 4 productos relacionados
-  };
 
 
   return (
@@ -55,33 +68,36 @@ const ProductDetail = ({ allProducts, onProductClick }) => {
             <nav className="breadcrumb">
               <Link to="/" onClick={() => setCurrentPage("home")}>Inicio</Link>
               <Link to="/products" onClick={() => setCurrentPage("products")}>Productos</Link>
-              {!error && product && <span id="breadcrumb-product">{product.name}</span>}
+              {!error && product && <span id="breadcrumb-product">{product.nombre || product.name}</span>}
             </nav>
             {product && (
               <div className="product-container">
                 <div className="product-detail-content">
                   <div className="product-detail-image">
-                    <img src={product.image} alt={product.name} />
+                    <img src={product.imagenUrl || product.image} alt={product.nombre || product.name} />
                   </div>
                   <div className="product-detail-info">
-                    <h1>{product.name}</h1>
+                    <h1>{product.nombre || product.name}</h1>
                     <div className="product-detail-price">
-                      {formatPrice(product.price)}
+                      {formatPrice(product.precio || product.price)}
                     </div>
                     <div className="product-detail-description">
-                      <p>{product.description}</p>
+                      <p>{product.descripcion || product.description}</p>
                     </div>
 
                     <div className="product-specs">
                       <h3>Especificaciones</h3>
                       <ul>
-                        {Object.entries(product.specifications).map(
+                        {product.specifications && Object.entries(product.specifications).map(
                           ([key, value]) => (
                             <li key={key}>
                               <span>{key}:</span>
                               <span>{value}</span>
                             </li>
                           )
+                        )}
+                        {(!product.specifications || Object.keys(product.specifications).length === 0) && (
+                          <li>No hay especificaciones disponibles</li>
                         )}
                       </ul>
                     </div>
@@ -111,8 +127,6 @@ const ProductDetail = ({ allProducts, onProductClick }) => {
                 <ProductCard
                   key={relatedProduct.id}
                   product={relatedProduct}
-                  onProductClick={onProductClick}
-                  onAddToCart={onAddToCart}
                 />
               ))}
             </div>
