@@ -38,6 +38,11 @@ const productSchema = new mongoose.Schema({
     destacado: {
         type: Boolean,
         default: false
+    },
+    specifications: {
+        type: Map,
+        of: String,
+        default: {}
     }
 }, {
     timestamps: true // Agrega createdAt y updatedAt automáticamente

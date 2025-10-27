@@ -56,6 +56,38 @@ const ProductDetail = () => {
     }).format(price);
   };
 
+  // Traducir claves de especificaciones al español
+  const translateSpecKey = (key) => {
+    const translations = {
+      'material': 'Material',
+      'dimensions': 'Dimensiones',
+      'finish': 'Acabado',
+      'warranty': 'Garantía',
+      'maxWeight': 'Peso máximo',
+      'levels': 'Niveles',
+      'size': 'Tamaño',
+      'headboardHeight': 'Altura cabecero',
+      'drawers': 'Cajones',
+      'doors': 'Puertas',
+      'shelves': 'Estantes',
+      'capacity': 'Capacidad',
+      'shape': 'Forma',
+      'type': 'Tipo',
+      'usage': 'Uso',
+      'comfort': 'Comodidad',
+      'ergonomics': 'Ergonomía',
+      'upholstery': 'Tapizado',
+      'mattress': 'Colchón',
+      'weight': 'Peso',
+      'diameter': 'Diámetro',
+      'height': 'Altura',
+      'length': 'Largo',
+      'width': 'Ancho',
+      'depth': 'Profundidad'
+    };
+    return translations[key] || key;
+  };
+
 
 
   return (
@@ -89,7 +121,7 @@ const ProductDetail = () => {
                         {product.specifications && Object.entries(product.specifications).map(
                           ([key, value]) => (
                             <li key={key}>
-                              <span>{key}:</span>
+                              <span>{translateSpecKey(key)}:</span>
                               <span>{value}</span>
                             </li>
                           )
