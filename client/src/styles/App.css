@@ -2445,6 +2445,59 @@ main {
     font-weight: 600;
 }
 
+.new-product-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; 
+  padding: 6rem 0; 
+  background-color: #fdf6ec;
+}
+
+.new-product-form {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 650px;
+  margin: 2rem auto 0 auto; 
+}
+
+.section-subtitle {
+  text-align: center;
+  margin-bottom: 2.5rem; 
+  font-size: 1rem;
+  color: #555;
+}
+
+.section-title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: #d2691e;
+  margin: 0.5rem auto 1.5rem auto;
+  border-radius: 2px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.new-product-success {
+  display: inline-block;
+  text-align: center;
+  padding: var(--spacing-xl);
+  background-color: #e6ffe6;
+  color: #006400;
+  border-radius: var(--radius-lg);
+  margin-top: var(--spacing-md);
+  font-weight: bold;
+  animation: fadeIn 0.5s ease;
+}
+
 /* Responsive Design for Payment Modal */
 @media (max-width: 768px) {
     .payment-modal-overlay {
