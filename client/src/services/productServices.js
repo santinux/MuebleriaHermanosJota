@@ -94,3 +94,23 @@ export const createProduct = async (productData) => {
         throw error;
     }
 };
+
+export const deleteProduct = async (id) => {
+    try {
+        const response = await fetch(`${BASE_URL}/${id}`, {
+            method: "DELETE"
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al eliminar el producto');
+        }
+        const { success, data } = await response.json();
+        if (!success) {
+            throw new Error('El servidor no pudo eliminar el producto');
+        }
+        return data;
+    } catch (error) {
+        console.error('Error eliminando producto:', error);
+        throw error;
+    }
+};

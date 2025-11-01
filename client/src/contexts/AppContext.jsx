@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const STORAGE_KEY = "reactShoppingCart";
+const AUTH_STORAGE_KEY = "reactAuthUser";
 const AppContext = createContext(null);
 
 const getId = (p) => p?.id ?? p?._id;
@@ -12,6 +13,17 @@ export default function AppProvider({ children }) {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
+
+    // Estado de autenticación
+    const [user, setUser] = useState(() => {
+        if (typeof window === "undefined") return null;
+        try {
+            const saved = localStorage.getItem(AUTH_STORAGE_KEY);
+            return saved ? JSON.parse(saved) : null;
+        } catch {
+            return null;
+        }
+    });
 
     // Carrito
     const [cart, setCart] = useState(() => {
@@ -30,6 +42,16 @@ export default function AppProvider({ children }) {
         if (typeof window === "undefined") return;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
     }, [cart]);
+
+    // Guardar usuario cuando cambie
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (user) {
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+        } else {
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+        }
+    }, [user]);
 
     // Acciones carrito
     const addToCart = (product, qty = 1) => {
@@ -85,6 +107,19 @@ export default function AppProvider({ children }) {
         [cart]
     );
 
+    // Funciones de autenticación
+    const login = (userData) => {
+        setUser(userData);
+    };
+
+    const logout = () => {
+        setUser(null);
+        setCurrentPage("home");
+    };
+
+    const isAdmin = user?.role === "admin";
+    const isClient = user?.role === "client";
+
     const value = {
         // Página
         currentPage,
@@ -107,6 +142,13 @@ export default function AppProvider({ children }) {
         setLoading,
         error,
         setError,
+
+        // Autenticación
+        user,
+        login,
+        logout,
+        isAdmin,
+        isClient,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

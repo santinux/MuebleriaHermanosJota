@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import CartDropdown from "./CartDropDown";
+import UserDropdown from "./UserDropdown";
 import { Link } from "react-router-dom";
 import "../styles/App.css";
 import { useAppContext } from "../contexts/AppContext.jsx";
@@ -7,7 +8,7 @@ import { useAppContext } from "../contexts/AppContext.jsx";
 const NavBar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const { currentPage, setCurrentPage, cart, addToCart, cartCount } = useAppContext();
+    const { currentPage, setCurrentPage, cart, addToCart, cartCount, user, isAdmin, logout } = useAppContext();
 
     // Hacer scroll hacia arriba cuando cambie la página
     useEffect(() => {
@@ -61,11 +62,40 @@ const NavBar = () => {
                             Contacto
                         </Link>
                     </li>
+                    {isAdmin && (
+                        <li>
+                            <Link
+                                to="/admin/crear-producto"
+                                onClick={() => handleChangePage("admin")}
+                                className={currentPage === "admin" ? "nav-link active" : "nav-link"}
+                            >
+                                ➕ Crear Producto
+                            </Link>
+                        </li>
+                    )}
                 </ul>
 
-                {/* Carrito de Compras */}
-                <div className="nav-cart">
-                    <CartDropdown cart={cart} onUpdateCart={addToCart} />
+                {/* Carrito de Compras y Usuario - A la derecha */}
+                <div className="nav-right">
+                    {/* Carrito de Compras - Solo para clientes */}
+                    {!isAdmin && (
+                        <div className="nav-cart">
+                            <CartDropdown cart={cart} onUpdateCart={addToCart} />
+                        </div>
+                    )}
+                    
+                    {/* Login o Usuario */}
+                    {user ? (
+                        <UserDropdown />
+                    ) : (
+                        <Link
+                            to="/login"
+                            onClick={() => handleChangePage("login")}
+                            className="nav-login-link"
+                        >
+                            🔐
+                        </Link>
+                    )}
                 </div>
 
                 {/* Hamburger Menu */}

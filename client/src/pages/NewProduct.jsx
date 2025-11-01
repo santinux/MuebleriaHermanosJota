@@ -39,24 +39,15 @@ const NewProduct = () => {
     setSuccess(false);
 
     try {
-      await createProduct({
+      const newProduct = await createProduct({
          ...form,
          precio: parseFloat(form.precio),
          stock: parseInt(form.stock),
          id: Date.now()
       });
       setLoading(false);
-      setSuccess(true);
-      setForm({
-        nombre: "",
-        descripcion: "",
-        precio: "",
-        stock: "",
-        imagenUrl: "",
-        categoria: "",
-        destacado: false
-      });
-
+      // Redirigir al catálogo después de crear
+      navigate('/products');
     } catch (err) {
       setLoading(false);
       setError(true);
@@ -73,13 +64,6 @@ const NewProduct = () => {
 
         <div className="new-product-form">
           {loading && <Loading />}
-
-            {success && (
-              <div className="new-product-success">
-                <h3>¡Producto creado con éxito!</h3>
-                <p>Ya podés verlo en el catálogo.</p>
-              </div>
-            )}
 
           <form onSubmit={handleSubmit}>
             {error && (

@@ -4,6 +4,7 @@ import Home from "./pages/Home.jsx";
 import Products from "./pages/Products.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";
 import Contact from "./pages/Contact.jsx";
+import Login from "./pages/Login.jsx";
 import Footer from "./components/Footer.jsx";
 import NewProduct from "./pages/NewProduct.jsx";
 import { NotFound } from "./pages/NotFound.jsx";
@@ -21,6 +22,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/contact" element={<Contact />} />

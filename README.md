@@ -156,7 +156,7 @@ Este script migrará los productos existentes del archivo `data/products.js` a l
 #### Terminal 1 - Backend:
 ```bash
 cd backend
-npm start
+npm run dev
 ```
 El servidor backend estará disponible en: `http://localhost:3000`
 

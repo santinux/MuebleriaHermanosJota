@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductsCard";
 import "../styles/App.css";
-import { getProductById, getAllProducts } from "../services/productServices";
-import { Link, useParams } from "react-router-dom";
+import { getProductById, getAllProducts, deleteProduct } from "../services/productServices";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useAppContext } from "../contexts/AppContext.jsx";
 import Loading from "../components/Loading.jsx";
 import Error from "../components/Error.jsx";
@@ -14,7 +14,8 @@ const ProductDetail = () => {
   const [allProducts, setAllProducts] = useState([]);
 
   const { id } = useParams();
-  const { setCurrentPage, addToCart, error, setError, loading, setLoading } = useAppContext();
+  const navigate = useNavigate();
+  const { setCurrentPage, addToCart, error, setError, loading, setLoading, isAdmin } = useAppContext();
 
   // Cargar todos los productos para productos relacionados
   useEffect(() => {
@@ -55,6 +56,24 @@ const ProductDetail = () => {
       style: "currency",
       currency: "ARS",
     }).format(price);
+  };
+
+  // Manejar eliminación de producto
+  const handleDelete = async () => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+      try {
+        setLoading(true);
+        await deleteProduct(id);
+        setLoading(false);
+        // Redirigir al catálogo después de eliminar
+        navigate('/products');
+        setCurrentPage('products');
+      } catch (error) {
+        console.error('Error al eliminar producto:', error);
+        setLoading(false);
+        alert('Error al eliminar el producto. Por favor, intenta nuevamente.');
+      }
+    }
   };
 
   // Traducir claves de especificaciones al español
@@ -133,12 +152,24 @@ const ProductDetail = () => {
                       </ul>
                     </div>
 
-                    <button
-                      className="btn btn-primary add-to-cart-btn"
-                      onClick={() => addToCart(product)}
-                    >
-                      Añadir al Carrito
-                    </button>
+                    <div className="product-actions">
+                      {!isAdmin && (
+                        <button
+                          className="btn btn-primary add-to-cart-btn"
+                          onClick={() => addToCart(product)}
+                        >
+                          Añadir al Carrito
+                        </button>
+                      )}
+                      {isAdmin && (
+                        <button
+                          className="btn btn-danger delete-btn"
+                          onClick={handleDelete}
+                        >
+                          🗑️ Eliminar Producto
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
