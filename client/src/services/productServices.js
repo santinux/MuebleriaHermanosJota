@@ -95,6 +95,30 @@ export const createProduct = async (productData) => {
     }
 };
 
+export const updateProduct = async (id, productData) => {
+    try {
+        const response = await fetch(`${BASE_URL}/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(productData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al actualizar el producto');
+        }
+        const { success, data } = await response.json();
+        if (!success) {
+            throw new Error('El servidor no pudo actualizar el producto');
+        }
+        return data;
+    } catch (error) {
+        console.error('Error actualizando producto:', error);
+        throw error;
+    }
+};
+
 export const deleteProduct = async (id) => {
     try {
         const response = await fetch(`${BASE_URL}/${id}`, {

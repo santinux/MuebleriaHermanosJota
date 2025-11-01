@@ -89,7 +89,7 @@ const searchProducts = async (req, res, next) => {
 // Crear un nuevo producto
 const createProduct = async (req, res, next) => {
     try {
-        const { nombre, descripcion, precio, stock, imagenUrl, categoria, destacado } = req.body;
+        const { nombre, descripcion, precio, stock, imagenUrl, categoria, destacado, specifications } = req.body;
         
         // Validar campos obligatorios
         if (!nombre || !precio) {
@@ -98,16 +98,29 @@ const createProduct = async (req, res, next) => {
             return next(error);
         }
         
-        const newProduct = new Product({
-            nombre,
-            descripcion,
-            precio,
-            stock: stock || 0,
-            imagenUrl,
-            categoria,
+        // Preparar datos del producto
+        const productData = {
+            nombre: nombre.trim(),
+            precio: Number(precio),
+            stock: stock ? Number(stock) : 0,
             destacado: destacado || false
-        });
+        };
         
+        // Agregar campos opcionales solo si tienen valor
+        if (descripcion && descripcion.trim()) {
+            productData.descripcion = descripcion.trim();
+        }
+        if (imagenUrl && imagenUrl.trim()) {
+            productData.imagenUrl = imagenUrl.trim();
+        }
+        if (categoria && categoria.trim()) {
+            productData.categoria = categoria.trim();
+        }
+        if (specifications && typeof specifications === 'object') {
+            productData.specifications = specifications;
+        }
+        
+        const newProduct = new Product(productData);
         const savedProduct = await newProduct.save();
         
         res.status(201).json({
@@ -126,18 +139,23 @@ const updateProduct = async (req, res, next) => {
         const { id } = req.params;
         const updateData = req.body;
         
-        // Validar que el ID sea válido
-        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-            const error = new Error('ID de producto inválido');
-            error.status = 400;
-            return next(error);
-        }
+        let updatedProduct;
         
-        const updatedProduct = await Product.findByIdAndUpdate(
-            id,
-            updateData,
-            { new: true, runValidators: true }
-        );
+        // Intentar por ID numérico primero
+        if (!isNaN(id)) {
+            updatedProduct = await Product.findOneAndUpdate(
+                { id: parseInt(id) },
+                updateData,
+                { new: true, runValidators: true }
+            );
+        } else {
+            // Intentar por _id de MongoDB
+            updatedProduct = await Product.findByIdAndUpdate(
+                id,
+                updateData,
+                { new: true, runValidators: true }
+            );
+        }
         
         if (!updatedProduct) {
             const error = new Error('Producto no encontrado');
@@ -160,14 +178,15 @@ const deleteProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
         
-        // Validar que el ID sea válido
-        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-            const error = new Error('ID de producto inválido');
-            error.status = 400;
-            return next(error);
-        }
+        let deletedProduct;
         
-        const deletedProduct = await Product.findByIdAndDelete(id);
+        // Intentar por ID numérico primero
+        if (!isNaN(id)) {
+            deletedProduct = await Product.findOneAndDelete({ id: parseInt(id) });
+        } else {
+            // Intentar por _id de MongoDB
+            deletedProduct = await Product.findByIdAndDelete(id);
+        }
         
         if (!deletedProduct) {
             const error = new Error('Producto no encontrado');

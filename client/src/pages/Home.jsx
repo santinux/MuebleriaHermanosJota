@@ -54,8 +54,10 @@ const Home = () => {
                         {loading && <Loading message="Cargando productos destacados..." />}
                         {error && <Error message="Error al cargar los productos destacados. Por favor, intentá nuevamente más tarde." />}
                         {featuredProducts && featuredProducts.length > 0 &&
-                            featuredProducts.slice(0, 6).map(product => (
-                                <Link className="product-card" to={`/products/${product.id}`} key={product.id} onClick={() => setCurrentPage("products")}>
+                            featuredProducts.slice(0, 6).map(product => {
+                                const productId = product.id || product._id;
+                                return (
+                                <Link className="product-card" to={`/products/${productId}`} key={productId} onClick={() => setCurrentPage("products")}>
                                     <div className="product-image">
                                         <img src={normalizeImageUrl(product.imagenUrl || product.image)} alt={product.nombre || product.name} />
                                     </div>
@@ -65,7 +67,7 @@ const Home = () => {
                                         <span className="product-price">{formatPrice(product.precio || product.price)}</span>
                                     </div>
                                 </Link>
-                            ))
+                            )})
                         }
                     </div>
                     <div className="see-more-container">

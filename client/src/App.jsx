@@ -7,6 +7,7 @@ import Contact from "./pages/Contact.jsx";
 import Login from "./pages/Login.jsx";
 import Footer from "./components/Footer.jsx";
 import NewProduct from "./pages/NewProduct.jsx";
+import EditProduct from "./pages/EditProduct.jsx";
 import { NotFound } from "./pages/NotFound.jsx";
 import { getFeaturedProducts } from "./services/productServices.js";
 import { Routes, Route } from "react-router-dom";
@@ -27,6 +28,7 @@ function App() {
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin/crear-producto" element={<NewProduct />} />
+          <Route path="/admin/editar-producto/:id" element={<EditProduct />} />
           {/* Ruta para manejar rutas no definidas */}
           <Route path="*" element={<NotFound />} />
         </Routes>

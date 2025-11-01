@@ -11,11 +11,12 @@ const ProductCard = ({ product}) => {
   };
 
   const imageUrl = normalizeImageUrl(product.imagenUrl || product.image);
+  const productId = product.id || product._id;
 
   return (
     <div className="product-card">
       <Link
-        to={`/products/${product.id}`}
+        to={`/products/${productId}`}
         className="product-link"
         style={{ cursor: "pointer" }}
       >

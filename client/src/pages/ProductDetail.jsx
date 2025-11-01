@@ -6,12 +6,18 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useAppContext } from "../contexts/AppContext.jsx";
 import Loading from "../components/Loading.jsx";
 import Error from "../components/Error.jsx";
+import ConfirmModal from "../components/ConfirmModal";
+import Toast from "../components/Toast";
 import { normalizeImageUrl } from "../utils/imageUtils";
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -44,8 +50,9 @@ const ProductDetail = () => {
   // Actualizar productos relacionados cuando cambie el producto o allProducts
   useEffect(() => {
     if (product && allProducts.length > 0) {
+      const productId = product.id || product._id;
       const related = allProducts
-        .filter(p => p.id !== product.id)
+        .filter(p => (p.id || p._id) !== productId)
         .slice(0, 4);
       setRelatedProducts(related);
     }
@@ -59,20 +66,36 @@ const ProductDetail = () => {
   };
 
   // Manejar eliminación de producto
-  const handleDelete = async () => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-      try {
-        setLoading(true);
-        await deleteProduct(id);
-        setLoading(false);
-        // Redirigir al catálogo después de eliminar
+  const handleDeleteClick = () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      setLoading(true);
+      setShowConfirmModal(false);
+      await deleteProduct(id);
+      setLoading(false);
+      
+      // Mostrar toast de éxito
+      setToastMessage('Producto eliminado exitosamente');
+      setToastType('success');
+      setShowToast(true);
+      
+      // Redirigir al catálogo después de un breve delay para ver el toast
+      setTimeout(() => {
         navigate('/products');
         setCurrentPage('products');
-      } catch (error) {
-        console.error('Error al eliminar producto:', error);
-        setLoading(false);
-        alert('Error al eliminar el producto. Por favor, intenta nuevamente.');
-      }
+      }, 1500);
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      setLoading(false);
+      setShowConfirmModal(false);
+      
+      // Mostrar toast de error
+      setToastMessage('Error al eliminar el producto. Por favor, intenta nuevamente.');
+      setToastType('error');
+      setShowToast(true);
     }
   };
 
@@ -162,12 +185,20 @@ const ProductDetail = () => {
                         </button>
                       )}
                       {isAdmin && (
-                        <button
-                          className="btn btn-danger delete-btn"
-                          onClick={handleDelete}
-                        >
-                          🗑️ Eliminar Producto
-                        </button>
+                        <>
+                          <Link
+                            to={`/admin/editar-producto/${id}`}
+                            className="btn btn-secondary"
+                          >
+                            ✏️ Editar Producto
+                          </Link>
+                          <button
+                            className="btn btn-danger delete-btn"
+                            onClick={handleDeleteClick}
+                          >
+                            🗑️ Eliminar Producto
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -178,6 +209,24 @@ const ProductDetail = () => {
 
         </div>
       </section>
+
+      {/* Modal de Confirmación */}
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar Eliminación"
+        message={`¿Estás seguro de que deseas eliminar "${product?.nombre || product?.name}"? Esta acción no se puede deshacer.`}
+      />
+
+      {/* Toast de Notificación */}
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setShowToast(false)}
+        />
+      )}
 
       {/* Productos Relacionados */}
       {product && relatedProducts.length > 0 && (

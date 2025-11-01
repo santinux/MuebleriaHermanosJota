@@ -25,13 +25,15 @@ const migrateProducts = async () => {
 
         // Mapear los datos existentes al nuevo esquema
         const productsToInsert = products.map(product => ({
+            id: product.id,
             nombre: product.name,
             descripcion: product.description,
             precio: product.price,
             stock: product.stock || 0,
             imagenUrl: product.image,
             categoria: product.category,
-            destacado: product.featured || false
+            destacado: product.featured || false,
+            specifications: product.specifications || {}
         }));
 
         // Insertar los productos

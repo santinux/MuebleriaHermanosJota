@@ -1,14 +1,17 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../contexts/AppContext.jsx";
-import { createProduct } from "../services/productServices.js";
+import { getProductById, updateProduct } from "../services/productServices.js";
 import "../styles/App.css";
 import Loading from "../components/Loading.jsx";
 import Error from "../components/Error.jsx";
 import Toast from "../components/Toast";
 
-const NewProduct = () => {
-    // Estado del formulario
+const EditProduct = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { loading, setLoading, error, setError } = useAppContext();
+  
   const [form, setForm] = useState({
     nombre: "",
     descripcion: "",
@@ -24,10 +27,40 @@ const NewProduct = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
-  const navigate = useNavigate();
-  const { loading, setLoading, error, setError } = useAppContext();
 
-  // Actualiza el estado al escribir en los campos
+  // Cargar datos del producto
+  useEffect(() => {
+    const loadProduct = async () => {
+      setLoading(true);
+      try {
+        const product = await getProductById(id);
+        const specs = product.specifications || {};
+        setForm({
+          nombre: product.nombre || "",
+          descripcion: product.descripcion || "",
+          precio: product.precio || "",
+          stock: product.stock || "",
+          imagenUrl: product.imagenUrl || "",
+          categoria: product.categoria || "",
+          destacado: product.destacado || false,
+          specifications: specs
+        });
+        // Inicializar IDs únicos para cada especificación
+        setSpecIds(Object.keys(specs).map((key, idx) => idx));
+        setError(false);
+      } catch (err) {
+        console.error("Error loading product:", err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      loadProduct();
+    }
+  }, [id, setLoading, setError]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm({
@@ -80,48 +113,45 @@ const NewProduct = () => {
     setSpecIds(prev => [...prev, prev.length]);
   };
 
-  // Envia el producto al backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(false);
 
     try {
-      const newProduct = await createProduct({
-         ...form,
-         precio: parseFloat(form.precio),
-         stock: form.stock ? parseInt(form.stock) : 0
+      await updateProduct(id, {
+        ...form,
+        precio: parseFloat(form.precio),
+        stock: form.stock ? parseInt(form.stock) : 0
       });
       setLoading(false);
       
       // Mostrar toast de éxito
-      setToastMessage('Producto creado exitosamente');
+      setToastMessage('Producto actualizado exitosamente');
       setToastType('success');
       setShowToast(true);
       
-      // Redirigir al producto creado después de un breve delay
+      // Redirigir al producto editado después de un breve delay
       setTimeout(() => {
-        const productId = newProduct.id || newProduct._id;
-        navigate(`/products/${productId}`);
+        navigate(`/products/${id}`);
       }, 1500);
     } catch (err) {
       setLoading(false);
       setError(true);
-      console.error("Error al crear producto:", err);
+      console.error("Error updating product:", err);
       
       // Mostrar toast de error
-      setToastMessage('Error al crear el producto. Verificá los campos.');
+      setToastMessage('Error al actualizar el producto. Verificá los campos.');
       setToastType('error');
       setShowToast(true);
     }
   };
 
-
   return (
     <main className="new-product-page">
       <div className="container">
-        <h2 className="section-title">Crear nuevo producto</h2>
-        <p className="section-subtitle">Completá los campos para agregar un nuevo producto al catálogo.</p>
+        <h2 className="section-title">Editar Producto</h2>
+        <p className="section-subtitle">Modificá los campos que desees actualizar.</p>
 
         <div className="new-product-form">
           {loading && <Loading />}
@@ -129,7 +159,7 @@ const NewProduct = () => {
           <form onSubmit={handleSubmit}>
             {error && (
               <p className="error-message full-width">
-                Hubo un error al crear el producto. Verificá los campos o el servidor.
+                Hubo un error al actualizar el producto. Verificá los campos o el servidor.
               </p>
             )}
 
@@ -214,11 +244,11 @@ const NewProduct = () => {
           </form>
 
           <div className="form-actions">
-            <button type="button" className="btn btn-secondary" onClick={() => navigate('/products')}>
+            <button type="button" className="btn btn-secondary" onClick={() => navigate(`/products/${id}`)}>
               Cancelar
             </button>
             <button type="button" className="btn btn-primary" onClick={handleSubmit}>
-              Crear producto
+              Guardar Cambios
             </button>
           </div>
         </div>
@@ -236,4 +266,5 @@ const NewProduct = () => {
   );
 };
 
-export default NewProduct;
+export default EditProduct;
+
