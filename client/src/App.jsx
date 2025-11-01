@@ -5,6 +5,7 @@ import Products from "./pages/Products.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";
 import Contact from "./pages/Contact.jsx";
 import Footer from "./components/Footer.jsx";
+import NewProduct from "./pages/NewProduct.jsx";
 import { NotFound } from "./pages/NotFound.jsx";
 import { getFeaturedProducts } from "./services/productServices.js";
 import { Routes, Route } from "react-router-dom";
@@ -23,7 +24,7 @@ function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/contact" element={<Contact />} />
-          {/* <Route path="/admin/crear-producto" element={<NewProduct />} /> */}
+          <Route path="/admin/crear-producto" element={<NewProduct />} />
           {/* Ruta para manejar rutas no definidas */}
           <Route path="*" element={<NotFound />} />
         </Routes>
