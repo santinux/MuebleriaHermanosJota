@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/App.css";
+import { normalizeImageUrl } from "../utils/imageUtils";
 
 const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
   const [formData, setFormData] = useState({
@@ -248,7 +249,7 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
                 <div className="order-items">
                   {cart.map((item) => (
                     <div key={item.id} className="order-item">
-                      <img src={item.imagenUrl || item.image} alt={item.nombre || item.name} />
+                      <img src={normalizeImageUrl(item.imagenUrl || item.image)} alt={item.nombre || item.name} />
                       <div className="item-details">
                         <h5>{item.nombre || item.name}</h5>
                         <p>Cantidad: {item.quantity}</p>

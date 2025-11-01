@@ -6,6 +6,7 @@ import { Link, useParams } from "react-router-dom";
 import { useAppContext } from "../contexts/AppContext.jsx";
 import Loading from "../components/Loading.jsx";
 import Error from "../components/Error.jsx";
+import { normalizeImageUrl } from "../utils/imageUtils";
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
@@ -104,7 +105,7 @@ const ProductDetail = () => {
               <div className="product-container">
                 <div className="product-detail-content">
                   <div className="product-detail-image">
-                    <img src={product.imagenUrl || product.image} alt={product.nombre || product.name} />
+                    <img src={normalizeImageUrl(product.imagenUrl || product.image)} alt={product.nombre || product.name} />
                   </div>
                   <div className="product-detail-info">
                     <h1>{product.nombre || product.name}</h1>

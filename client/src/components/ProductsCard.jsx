@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { normalizeImageUrl } from "../utils/imageUtils";
 
 const ProductCard = ({ product}) => {
   const formatPrice = (price) => {
@@ -9,6 +10,8 @@ const ProductCard = ({ product}) => {
     }).format(price);
   };
 
+  const imageUrl = normalizeImageUrl(product.imagenUrl || product.image);
+
   return (
     <div className="product-card">
       <Link
@@ -17,7 +20,7 @@ const ProductCard = ({ product}) => {
         style={{ cursor: "pointer" }}
       >
         <div className="product-image">
-          <img src={product.imagenUrl || product.image} alt={product.nombre || product.name} />
+          <img src={imageUrl} alt={product.nombre || product.name} />
         </div>
         <div className="product-info">
           <h3 className="product-name">{product.nombre || product.name}</h3>

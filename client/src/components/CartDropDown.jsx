@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PaymentModal from "./PaymentModal";
 import { useAppContext } from "../contexts/AppContext.jsx";
+import { normalizeImageUrl } from "../utils/imageUtils";
 
 const CartDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -87,7 +88,7 @@ const CartDropdown = () => {
             cart.map((item) => (
               <div key={item.id} className="cart-item">
                 <img
-                  src={item.imagenUrl || item.image}
+                  src={normalizeImageUrl(item.imagenUrl || item.image)}
                   alt={item.nombre || item.name}
                   className="cart-item-image"
                 />

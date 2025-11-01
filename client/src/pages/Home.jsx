@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppContext.jsx';
 import Loading from '../components/Loading.jsx';
 import Error from '../components/Error.jsx';
+import { normalizeImageUrl } from '../utils/imageUtils';
 
 
 const Home = () => {
@@ -56,7 +57,7 @@ const Home = () => {
                             featuredProducts.slice(0, 6).map(product => (
                                 <Link className="product-card" to={`/products/${product.id}`} key={product.id} onClick={() => setCurrentPage("products")}>
                                     <div className="product-image">
-                                        <img src={product.imagenUrl || product.image} alt={product.nombre || product.name} />
+                                        <img src={normalizeImageUrl(product.imagenUrl || product.image)} alt={product.nombre || product.name} />
                                     </div>
                                     <div className="product-info">
                                         <h3 className="product-name">{product.nombre || product.name}</h3>
