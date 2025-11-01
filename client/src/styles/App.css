@@ -2721,3 +2721,97 @@ main {
 .purchase-tips li:nth-child(3) { transition-delay: 0.4s; }
 .purchase-tips li:nth-child(4) { transition-delay: 0.5s; }
 .purchase-tips li:nth-child(5) { transition-delay: 0.6s; }
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px; /* Ancho del switch */
+  height: 20px; /* Alto del switch */
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc; /* Color de fondo cuando está apagado */
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px; /* Alto del círculo */
+  width: 16px; /* Ancho del círculo */
+  left: 2px; /* Posición inicial del círculo */
+  bottom: 2px; /* Posición inicial del círculo */
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #d2691e; /* Color de fondo cuando está encendido */
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(20px); /* Mover el círculo a la derecha */
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 20px; /* Para que el fondo sea redondeado */
+}
+
+.slider.round:before {
+  border-radius: 50%; /* Para que el círculo sea redondo */
+}
+
+.delete-button {
+    /* Colores */
+    background-color: #dc3545; /* Rojo de Bootstrap (peligro) */
+    color: white; /* Texto blanco para contraste */
+    border: none; /* Elimina el borde predeterminado */
+    
+    /* Forma y Espaciado */
+    padding: 8px 15px;
+    border-radius: 5px; /* Bordes ligeramente redondeados */
+    margin-top: 10px; /* Separación del contenido superior */
+    cursor: pointer; /* Indica que es clickeable */
+    
+    /* Tipografía */
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, transform 0.1s ease; /* Transiciones suaves */
+}
+
+/* Efecto al pasar el mouse (hover) */
+.delete-button:hover {
+    background-color: #c82333; /* Un rojo un poco más oscuro */
+    /* Puedes añadir una sombra sutil si quieres: box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
+}
+
+/* Efecto al hacer click (active) */
+.delete-button:active {
+    background-color: #bd2130; /* Un rojo más profundo */
+    transform: translateY(1px); /* Efecto de "presionado" */
+}

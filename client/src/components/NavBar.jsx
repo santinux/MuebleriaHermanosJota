@@ -3,11 +3,12 @@ import CartDropdown from "./CartDropDown";
 import { Link } from "react-router-dom";
 import "../styles/App.css";
 import { useAppContext } from "../contexts/AppContext.jsx";
+import Switch from "./Switch.jsx";
 
 const NavBar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const { currentPage, setCurrentPage, cart, addToCart, cartCount } = useAppContext();
+    const { currentPage, setCurrentPage, cart, addToCart, cartCount, isAdmin, setIsAdmin } = useAppContext();
 
     // Hacer scroll hacia arriba cuando cambie la página
     useEffect(() => {
@@ -21,6 +22,10 @@ const NavBar = () => {
     const handleChangePage = (page) => {
         setCurrentPage(page);
         setIsMenuOpen(false); // Cerrar el menú al cambiar de página
+    };
+
+    const handleAdminToggle = (checked) => {
+        setIsAdmin(checked);
     };
 
     return (
@@ -60,6 +65,10 @@ const NavBar = () => {
                         >
                             Contacto
                         </Link>
+                    </li>
+                    <li className="admin-toggle">
+                        <span>Admin </span>
+                        <Switch onToggle={handleAdminToggle} initialChecked={isAdmin} />
                     </li>
                 </ul>
 

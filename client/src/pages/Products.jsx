@@ -12,7 +12,7 @@ const Products = () => {
   const [isTipsVisible, setIsTipsVisible] = useState(false);
   const tipsRef = useRef(null);
 
-  const { setCurrentPage, error, setError, loading, setLoading } = useAppContext();
+  const { setCurrentPage, error, setError, loading, setLoading, isAdmin} = useAppContext();
 
   // Función para manejar la búsqueda
   const handleSearch = (e) => {
@@ -122,6 +122,7 @@ const Products = () => {
                     <ProductCard
                       key={product.id}
                       product={product}
+                      isAdmin={isAdmin}
                     />
                   ))
                 ) : (

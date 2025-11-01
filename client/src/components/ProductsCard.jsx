@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const ProductCard = ({ product}) => {
+const ProductCard = ({ product, isAdmin }) => {
   const formatPrice = (price) => {
     return new Intl.NumberFormat("es-AR", {
       style: "currency",
@@ -24,6 +24,12 @@ const ProductCard = ({ product}) => {
           <p className="product-description">{product.descripcion || product.description}</p>
           <span className="product-price">{formatPrice(product.precio || product.price)}</span>
         </div>
+        {isAdmin && (
+          <div>
+            <button
+              className="delete-button"
+              onClick={() => handleDelete(product.id)}>Borrar Producto</button>
+          </div>)}
       </Link>
     </div>
   );

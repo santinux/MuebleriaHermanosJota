@@ -13,6 +13,9 @@ export default function AppProvider({ children }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
 
+    // Nuevo estado global para el modo administrador
+    const [isAdmin, setIsAdmin] = useState(false);
+
     // Carrito
     const [cart, setCart] = useState(() => {
         if (typeof window === "undefined") return [];
@@ -101,6 +104,9 @@ export default function AppProvider({ children }) {
         clearCart,
         cartCount,
         cartTotal,
+        // Estado modo administrador
+        isAdmin, 
+        setIsAdmin,
 
         // Estado general
         loading,
