@@ -4,12 +4,14 @@ import { useAppContext } from "../contexts/AppContext.jsx";
 import "../styles/App.css";
 import Toast from "../components/Toast";
 
-const Login = () => {
+const Register = () => {
     const navigate = useNavigate();
-    const { login, setCurrentPage, loading } = useAppContext();
+    const { register, setCurrentPage, loading } = useAppContext();
     const [formData, setFormData] = useState({
+        nombre: "",
         email: "",
-        password: ""
+        password: "",
+        confirmPassword: ""
     });
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -26,17 +28,35 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (!formData.email || !formData.password) {
+        if (!formData.nombre || !formData.email || !formData.password) {
             setToastMessage('Por favor completa todos los campos');
             setToastType('error');
             setShowToast(true);
             return;
         }
 
-        const result = await login(formData);
+        if (formData.password.length < 6) {
+            setToastMessage('La contraseña debe tener al menos 6 caracteres');
+            setToastType('error');
+            setShowToast(true);
+            return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            setToastMessage('Las contraseñas no coinciden');
+            setToastType('error');
+            setShowToast(true);
+            return;
+        }
+
+        const result = await register({
+            nombre: formData.nombre,
+            email: formData.email,
+            password: formData.password
+        });
         
         if (result.success) {
-            setToastMessage(result.message || 'Inicio de sesión exitoso');
+            setToastMessage(result.message || 'Registro exitoso');
             setToastType('success');
             setShowToast(true);
             setCurrentPage('home');
@@ -44,7 +64,7 @@ const Login = () => {
                 navigate('/');
             }, 1000);
         } else {
-            setToastMessage(result.message || 'Error al iniciar sesión');
+            setToastMessage(result.message || 'Error al registrar usuario');
             setToastType('error');
             setShowToast(true);
         }
@@ -54,10 +74,23 @@ const Login = () => {
         <div className="login-page">
             <div className="container">
                 <div className="login-card">
-                    <h2 className="login-title">Iniciar Sesión</h2>
-                    <p className="login-subtitle">Ingresa tus credenciales para continuar</p>
+                    <h2 className="login-title">Crear Cuenta</h2>
+                    <p className="login-subtitle">Regístrate para comenzar a comprar</p>
                     
                     <form onSubmit={handleSubmit} className="auth-form">
+                        <div className="form-group">
+                            <label htmlFor="nombre">Nombre:</label>
+                            <input
+                                type="text"
+                                id="nombre"
+                                name="nombre"
+                                value={formData.nombre}
+                                onChange={handleChange}
+                                required
+                                placeholder="Tu nombre completo"
+                            />
+                        </div>
+
                         <div className="form-group">
                             <label htmlFor="email">Email:</label>
                             <input
@@ -80,7 +113,21 @@ const Login = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
-                                placeholder="••••••••"
+                                placeholder="Mínimo 6 caracteres"
+                                minLength={6}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="confirmPassword">Confirmar Contraseña:</label>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                required
+                                placeholder="Repite tu contraseña"
                                 minLength={6}
                             />
                         </div>
@@ -90,12 +137,12 @@ const Login = () => {
                             className="btn btn-primary"
                             disabled={loading}
                         >
-                            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                            {loading ? 'Registrando...' : 'Registrarse'}
                         </button>
                     </form>
 
                     <p className="auth-link">
-                        ¿No tienes una cuenta? <Link to="/registro">Regístrate aquí</Link>
+                        ¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link>
                     </p>
                 </div>
             </div>
@@ -111,4 +158,5 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Register;
+

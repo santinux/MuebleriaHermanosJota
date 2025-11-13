@@ -5,9 +5,12 @@ import Products from "./pages/Products.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";
 import Contact from "./pages/Contact.jsx";
 import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import Profile from "./pages/Profile.jsx";
 import Footer from "./components/Footer.jsx";
 import NewProduct from "./pages/NewProduct.jsx";
 import EditProduct from "./pages/EditProduct.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { NotFound } from "./pages/NotFound.jsx";
 import { getFeaturedProducts } from "./services/productServices.js";
 import { Routes, Route } from "react-router-dom";
@@ -24,9 +27,18 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<Register />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/contact" element={<Contact />} />
+          <Route 
+            path="/perfil" 
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/admin/crear-producto" element={<NewProduct />} />
           <Route path="/admin/editar-producto/:id" element={<EditProduct />} />
           {/* Ruta para manejar rutas no definidas */}

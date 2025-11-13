@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useAppContext } from "../contexts/AppContext.jsx";
 
 const UserDropdown = () => {
@@ -37,7 +38,7 @@ const UserDropdown = () => {
       <div className={`user-dropdown ${isOpen ? "show" : ""}`}>
         <div className="user-dropdown-header">
           <div className="user-info">
-            <span className="user-name">{user?.name}</span>
+            <span className="user-name">{user?.nombre || user?.name}</span>
             <span className="user-role">{user?.role === "admin" ? "Administrador" : "Cliente"}</span>
           </div>
           <button
@@ -49,6 +50,14 @@ const UserDropdown = () => {
         </div>
         
         <div className="user-dropdown-content">
+          <Link
+            to="/perfil"
+            className="user-dropdown-item"
+            onClick={() => setIsOpen(false)}
+          >
+            <span className="item-icon">👤</span>
+            <span className="item-text">Mi Perfil</span>
+          </Link>
           <button
             className="user-dropdown-item logout-item"
             onClick={handleLogout}

@@ -213,14 +213,14 @@ const NewProduct = () => {
 
           </form>
 
-          <div className="form-actions">
+            <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={() => navigate('/products')}>
               Cancelar
             </button>
             <button type="button" className="btn btn-primary" onClick={handleSubmit}>
               Crear producto
             </button>
-          </div>
+            </div>
         </div>
       </div>
 

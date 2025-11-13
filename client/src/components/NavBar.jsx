@@ -8,7 +8,7 @@ import { useAppContext } from "../contexts/AppContext.jsx";
 const NavBar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const { currentPage, setCurrentPage, cart, addToCart, cartCount, user, isAdmin, logout } = useAppContext();
+    const { currentPage, setCurrentPage, cart, addToCart, cartCount, user, isAdmin, isAuthenticated, logout } = useAppContext();
 
     // Hacer scroll hacia arriba cuando cambie la página
     useEffect(() => {

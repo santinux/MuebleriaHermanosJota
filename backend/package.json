@@ -10,7 +10,13 @@
     "test:endpoints": "node scripts/testEndpoints.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["muebleria", "api", "nodejs", "express", "mongodb"],
+  "keywords": [
+    "muebleria",
+    "api",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
   "author": "Mueblería Hermanos Jota",
   "license": "ISC",
   "type": "commonjs",
@@ -19,9 +25,11 @@
   },
   "dependencies": {
     "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2"
   },
   "devDependencies": {

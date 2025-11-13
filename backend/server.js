@@ -4,6 +4,8 @@ const cors = require('cors');
 const logger = require('./middleware/logger');
 const productRoutes = require('./routes/productRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const authRoutes = require('./routes/authRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 const { loadContactsFromFile } = require('./controllers/contactController');
 const connectDB = require('./config/database');
 const app = express();
@@ -23,6 +25,8 @@ app.use(logger);
 // Middleware para resolver rutas
 app.use('/api/productos', productRoutes);
 app.use('/api', contactRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/pedidos', orderRoutes);
 
 // Health check endpoint para Render
 app.get('/api/health', (req, res) => {
@@ -44,7 +48,10 @@ app.use((req, res, next) => {
 // Middleware para manejo de errores centralizado
 app.use((err, req, res, next) => {
     const statusCode = err.status || 500;
+    console.error('Error:', err.message);
+    console.error('Stack:', err.stack);
     res.status(statusCode).json({
+        success: false,
         message: err.message || 'Ha ocurrido un error en el servidor'
     });
 });

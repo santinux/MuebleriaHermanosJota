@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PaymentModal from "./PaymentModal";
 import { useAppContext } from "../contexts/AppContext.jsx";
 import { normalizeImageUrl } from "../utils/imageUtils";
@@ -6,12 +7,14 @@ import { normalizeImageUrl } from "../utils/imageUtils";
 const CartDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const navigate = useNavigate();
   const { cart,
         setItemQty,
         removeFromCart,
         clearCart,
         cartCount,
-        cartTotal
+        cartTotal,
+        isAuthenticated
     } = useAppContext();
 
   // Formatear precio
@@ -32,6 +35,12 @@ const CartDropdown = () => {
   const proceedToCheckout = () => {
     if (cart.length === 0) {
       alert("Tu carrito está vacío");
+      return;
+    }
+    if (!isAuthenticated) {
+      alert("Debes iniciar sesión para realizar una compra");
+      setIsOpen(false);
+      navigate('/login');
       return;
     }
     setIsOpen(false);

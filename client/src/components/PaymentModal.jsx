@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import "../styles/App.css";
 import { normalizeImageUrl } from "../utils/imageUtils";
+import { createOrder } from "../services/orderService";
+import { useAppContext } from "../contexts/AppContext";
+import Toast from "./Toast";
 
 const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
+  const { loading, setLoading } = useAppContext();
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,26 +43,65 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Simular procesamiento de pago
-    setTimeout(() => {
-      alert("¡Pago procesado exitosamente!");
-      onClearCart();
-      onClose();
-      setCurrentStep(1);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        address: "",
-        paymentMethod: "credit",
-        cardNumber: "",
-        expiryDate: "",
-        cvv: "",
-      });
-    }, 2000);
+    if (cart.length === 0) {
+      setToastMessage('El carrito está vacío');
+      setToastType('error');
+      setShowToast(true);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Preparar datos del pedido
+      const orderData = {
+        items: cart.map(item => ({
+          productId: item.id || item._id,
+          cantidad: item.quantity
+        })),
+        shippingInfo: {
+          nombre: formData.name,
+          email: formData.email,
+          telefono: formData.phone,
+          direccion: formData.address
+        },
+        paymentMethod: formData.paymentMethod
+      };
+
+      const response = await createOrder(orderData);
+      
+      if (response.success) {
+        setToastMessage('¡Pedido creado exitosamente!');
+        setToastType('success');
+        setShowToast(true);
+        onClearCart();
+        setTimeout(() => {
+          onClose();
+          setCurrentStep(1);
+          setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            address: "",
+            paymentMethod: "credit",
+            cardNumber: "",
+            expiryDate: "",
+            cvv: "",
+          });
+        }, 2000);
+      } else {
+        throw new Error(response.message || 'Error al crear el pedido');
+      }
+    } catch (error) {
+      console.error('Error al crear pedido:', error);
+      setToastMessage(error.message || 'Error al procesar el pedido. Por favor intenta nuevamente.');
+      setToastType('error');
+      setShowToast(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const nextStep = () => {
@@ -290,6 +336,14 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
           </div>
         </form>
       </div>
+
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 };

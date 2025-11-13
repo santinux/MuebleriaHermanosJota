@@ -1,8 +1,10 @@
 // src/context/AppContext.jsx
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { login as loginService, getProfile } from "../services/authService";
 
 const STORAGE_KEY = "reactShoppingCart";
 const AUTH_STORAGE_KEY = "reactAuthUser";
+const TOKEN_STORAGE_KEY = "reactAuthToken";
 const AppContext = createContext(null);
 
 const getId = (p) => p?.id ?? p?._id;
@@ -19,7 +21,25 @@ export default function AppProvider({ children }) {
         if (typeof window === "undefined") return null;
         try {
             const saved = localStorage.getItem(AUTH_STORAGE_KEY);
-            return saved ? JSON.parse(saved) : null;
+            const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+            if (saved && token) {
+                return JSON.parse(saved);
+            }
+            return null;
+        } catch {
+            return null;
+        }
+    });
+
+    const [token, setToken] = useState(() => {
+        if (typeof window === "undefined") return null;
+        try {
+            const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+            if (savedToken) {
+                // Limpiar el token al cargarlo
+                return savedToken.toString().trim().replace(/^["']|["']$/g, '');
+            }
+            return null;
         } catch {
             return null;
         }
@@ -43,15 +63,19 @@ export default function AppProvider({ children }) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
     }, [cart]);
 
-    // Guardar usuario cuando cambie
+    // Guardar usuario y token cuando cambien
     useEffect(() => {
         if (typeof window === "undefined") return;
-        if (user) {
+        if (user && token) {
             localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+            // Asegurarse de que el token se guarde sin comillas
+            const cleanToken = token.toString().trim().replace(/^["']|["']$/g, '');
+            localStorage.setItem(TOKEN_STORAGE_KEY, cleanToken);
         } else {
             localStorage.removeItem(AUTH_STORAGE_KEY);
+            localStorage.removeItem(TOKEN_STORAGE_KEY);
         }
-    }, [user]);
+    }, [user, token]);
 
     // Acciones carrito
     const addToCart = (product, qty = 1) => {
@@ -108,15 +132,54 @@ export default function AppProvider({ children }) {
     );
 
     // Funciones de autenticación
-    const login = (userData) => {
-        setUser(userData);
+    const login = async (credentials) => {
+        try {
+            setLoading(true);
+            const response = await loginService(credentials);
+            if (response.success && response.data) {
+                setUser(response.data.user);
+                // Limpiar el token antes de guardarlo
+                const cleanToken = response.data.token ? response.data.token.toString().trim().replace(/^["']|["']$/g, '') : null;
+                setToken(cleanToken);
+                return { success: true, message: response.message };
+            }
+            throw new Error(response.message || 'Error al iniciar sesión');
+        } catch (error) {
+            console.error('Error en login:', error);
+            return { success: false, message: error.message || 'Error al iniciar sesión' };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const register = async (userData) => {
+        try {
+            setLoading(true);
+            const { register: registerService } = await import('../services/authService');
+            const response = await registerService(userData);
+            if (response.success && response.data) {
+                setUser(response.data.user);
+                // Limpiar el token antes de guardarlo
+                const cleanToken = response.data.token ? response.data.token.toString().trim().replace(/^["']|["']$/g, '') : null;
+                setToken(cleanToken);
+                return { success: true, message: response.message };
+            }
+            throw new Error(response.message || 'Error al registrar usuario');
+        } catch (error) {
+            console.error('Error en registro:', error);
+            return { success: false, message: error.message || 'Error al registrar usuario' };
+        } finally {
+            setLoading(false);
+        }
     };
 
     const logout = () => {
         setUser(null);
+        setToken(null);
         setCurrentPage("home");
     };
 
+    const isAuthenticated = !!user && !!token;
     const isAdmin = user?.role === "admin";
     const isClient = user?.role === "client";
 
@@ -145,8 +208,11 @@ export default function AppProvider({ children }) {
 
         // Autenticación
         user,
+        token,
         login,
+        register,
         logout,
+        isAuthenticated,
         isAdmin,
         isClient,
     };
