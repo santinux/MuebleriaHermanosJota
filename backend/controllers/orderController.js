@@ -169,9 +169,139 @@ const getOrderById = async (req, res, next) => {
   }
 };
 
+// Obtener todos los pedidos (solo admin)
+const getAllOrders = async (req, res, next) => {
+  try {
+    console.log('getAllOrders - Usuario:', req.user?.email, 'Rol:', req.user?.role);
+    
+    // Verificar que el usuario sea admin
+    if (req.user.role !== 'admin') {
+      console.log('getAllOrders - Acceso denegado: usuario no es admin');
+      return res.status(403).json({
+        success: false,
+        message: 'No tienes permisos para acceder a esta información'
+      });
+    }
+
+    const orders = await Order.find({})
+      .sort({ createdAt: -1 })
+      .populate('user', 'nombre email')
+      .populate('items.product', 'nombre imagenUrl');
+
+    console.log('getAllOrders - Pedidos encontrados:', orders.length);
+
+    res.json({
+      success: true,
+      data: orders,
+      count: orders.length
+    });
+  } catch (error) {
+    console.error('Error al obtener todos los pedidos:', error);
+    next(error);
+  }
+};
+
+// Obtener estadísticas de pedidos (solo admin)
+const getOrderStats = async (req, res, next) => {
+  try {
+    // Verificar que el usuario sea admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'No tienes permisos para acceder a esta información'
+      });
+    }
+
+    const totalOrders = await Order.countDocuments();
+    const totalRevenue = await Order.aggregate([
+      { $match: { status: { $ne: 'cancelled' } } },
+      { $group: { _id: null, total: { $sum: '$total' } } }
+    ]);
+
+    const ordersByStatus = await Order.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+
+    const recentOrders = await Order.find({})
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate('user', 'nombre email')
+      .select('total status createdAt');
+
+    const stats = {
+      totalOrders,
+      totalRevenue: totalRevenue[0]?.total || 0,
+      ordersByStatus: ordersByStatus.reduce((acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+      }, {}),
+      recentOrders
+    };
+
+    res.json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    next(error);
+  }
+};
+
+// Actualizar estado de un pedido (solo admin)
+const updateOrderStatus = async (req, res, next) => {
+  try {
+    // Verificar que el usuario sea admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'No tienes permisos para actualizar pedidos'
+      });
+    }
+
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Estado inválido. Debe ser uno de: ${validStatuses.join(', ')}`
+      });
+    }
+
+    const order = await Order.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true, runValidators: true }
+    )
+      .populate('user', 'nombre email')
+      .populate('items.product', 'nombre imagenUrl');
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pedido no encontrado'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Estado del pedido actualizado exitosamente',
+      data: order
+    });
+  } catch (error) {
+    console.error('Error al actualizar estado del pedido:', error);
+    next(error);
+  }
+};
+
 module.exports = {
   createOrder,
   getUserOrders,
-  getOrderById
+  getOrderById,
+  getAllOrders,
+  getOrderStats,
+  updateOrderStatus
 };
 

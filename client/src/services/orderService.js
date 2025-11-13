@@ -120,3 +120,91 @@ export const getOrderById = async (orderId) => {
   }
 };
 
+// Obtener todos los pedidos (solo admin)
+export const getAllOrders = async () => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const response = await fetch(`${BASE_URL}/admin/todos`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al obtener los pedidos');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error al obtener todos los pedidos:', error);
+    throw error;
+  }
+};
+
+// Obtener estadísticas de pedidos (solo admin)
+export const getOrderStats = async () => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const response = await fetch(`${BASE_URL}/admin/estadisticas`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al obtener las estadísticas');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    throw error;
+  }
+};
+
+// Actualizar estado de un pedido (solo admin)
+export const updateOrderStatus = async (orderId, status) => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const response = await fetch(`${BASE_URL}/admin/${orderId}/estado`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al actualizar el estado del pedido');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error al actualizar estado del pedido:', error);
+    throw error;
+  }
+};
+

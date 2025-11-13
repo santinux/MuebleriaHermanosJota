@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PaymentModal from "./PaymentModal";
+import Toast from "./Toast";
 import { useAppContext } from "../contexts/AppContext.jsx";
 import { normalizeImageUrl } from "../utils/imageUtils";
 
 const CartDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('error');
   const navigate = useNavigate();
   const { cart,
         setItemQty,
@@ -34,13 +38,20 @@ const CartDropdown = () => {
   // Proceder al checkout
   const proceedToCheckout = () => {
     if (cart.length === 0) {
-      alert("Tu carrito está vacío");
+      setToastMessage("Tu carrito está vacío");
+      setToastType('error');
+      setShowToast(true);
       return;
     }
     if (!isAuthenticated) {
-      alert("Debes iniciar sesión para realizar una compra");
+      setToastMessage("Debes iniciar sesión para realizar una compra");
+      setToastType('error');
+      setShowToast(true);
       setIsOpen(false);
-      navigate('/login');
+      // Redirigir después de un breve delay para que se vea el toast
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
       return;
     }
     setIsOpen(false);
@@ -154,6 +165,15 @@ const CartDropdown = () => {
         cart={cart}
         onClearCart={handlePaymentSuccess}
       />
+
+      {/* Toast de Notificación */}
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/App.css";
 import { normalizeImageUrl } from "../utils/imageUtils";
 import { createOrder } from "../services/orderService";
@@ -7,6 +7,19 @@ import Toast from "./Toast";
 
 const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
   const { loading, setLoading } = useAppContext();
+
+  // Bloquear scroll del body cuando el modal esté abierto
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    // Cleanup: restaurar scroll cuando el componente se desmonte
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
@@ -112,11 +125,23 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
     setCurrentStep(currentStep - 1);
   };
 
+  // Cerrar modal al hacer click fuera
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  // Prevenir que el click dentro del modal cierre el modal
+  const handleModalClick = (e) => {
+    e.stopPropagation();
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="payment-modal-overlay">
-      <div className="payment-modal">
+    <div className="payment-modal-overlay" onClick={handleOverlayClick}>
+      <div className="payment-modal" onClick={handleModalClick}>
         <div className="payment-modal-header">
           <h2>Proceder al Pago</h2>
           <button className="payment-modal-close" onClick={onClose}>
@@ -139,7 +164,8 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="payment-form">
+        <div className="payment-modal-content">
+          <form onSubmit={handleSubmit} className="payment-form">
           {/* Paso 1: Información Personal */}
           {currentStep === 1 && (
             <div className="payment-step">
@@ -318,23 +344,24 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
             </div>
           )}
 
-          <div className="payment-modal-actions">
-            {currentStep > 1 && (
-              <button type="button" onClick={prevStep} className="btn btn-secondary">
-                Anterior
-              </button>
-            )}
-            {currentStep < 3 ? (
-              <button type="button" onClick={nextStep} className="btn btn-primary">
-                Siguiente
-              </button>
-            ) : (
-              <button type="submit" className="btn btn-primary">
-                Confirmar Pago
-              </button>
-            )}
-          </div>
-        </form>
+            <div className="payment-modal-actions">
+              {currentStep > 1 && (
+                <button type="button" onClick={prevStep} className="btn btn-secondary">
+                  Anterior
+                </button>
+              )}
+              {currentStep < 3 ? (
+                <button type="button" onClick={nextStep} className="btn btn-primary">
+                  Siguiente
+                </button>
+              ) : (
+                <button type="submit" className="btn btn-primary">
+                  Confirmar Pago
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
 
       {showToast && (
