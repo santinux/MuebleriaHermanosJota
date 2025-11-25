@@ -77,6 +77,11 @@ const CartDropdown = () => {
     };
   }, [isOpen]);
 
+  const handleCloseModal = () => {
+
+    setIsPaymentModalOpen(false);
+  };
+
   return (
     <div className={`cart-dropdown-container ${isOpen ? "open" : ""}`}>
       <div
@@ -161,7 +166,7 @@ const CartDropdown = () => {
       {/* Payment Modal */}
       <PaymentModal
         isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
+        onClose={handleCloseModal}
         cart={cart}
         onClearCart={handlePaymentSuccess}
       />

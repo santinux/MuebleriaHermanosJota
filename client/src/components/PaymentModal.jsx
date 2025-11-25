@@ -6,7 +6,7 @@ import { useAppContext } from "../contexts/AppContext";
 import Toast from "./Toast";
 
 const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
-  const { loading, setLoading } = useAppContext();
+  const { loading, setLoading, user } = useAppContext();
 
   // Bloquear scroll del body cuando el modal esté abierto
   useEffect(() => {
@@ -35,6 +35,7 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
   });
 
   const [currentStep, setCurrentStep] = useState(1);
+  const [errors, setErrors] = useState({});
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("es-AR", {
@@ -54,6 +55,13 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
       ...formData,
       [name]: value,
     });
+    // Limpiar error del campo cuando el usuario empiece a escribir
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: "",
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -64,6 +72,16 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
       setToastType('error');
       setShowToast(true);
       return;
+    }
+
+    // Validar datos de tarjeta si el método de pago es crédito o débito
+    if (formData.paymentMethod === "credit" || formData.paymentMethod === "debit") {
+      if (!validateStep2()) {
+        setToastMessage('Por favor completa todos los campos de la tarjeta');
+        setToastType('error');
+        setShowToast(true);
+        return;
+      }
     }
 
     setLoading(true);
@@ -117,11 +135,96 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
     }
   };
 
-  const nextStep = () => {
+  const validateStep1 = () => {
+    const newErrors = {};
+    
+    if (!formData.name || formData.name.trim() === "") {
+      newErrors.name = "El nombre es requerido";
+    }
+    
+    if (!formData.email || formData.email.trim() === "") {
+      newErrors.email = "El email es requerido";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "El email no es válido";
+    }
+    
+    if (!formData.phone || formData.phone.trim() === "") {
+      newErrors.phone = "El teléfono es requerido";
+    }
+    
+    if (!formData.address || formData.address.trim() === "") {
+      newErrors.address = "La dirección es requerida";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    const newErrors = {};
+    
+    // Solo validar campos de tarjeta si el método de pago es crédito o débito
+    if (formData.paymentMethod === "credit" || formData.paymentMethod === "debit") {
+      if (!formData.cardNumber || formData.cardNumber.trim() === "") {
+        newErrors.cardNumber = "El número de tarjeta es requerido";
+      } else {
+        // Remover espacios y validar que tenga al menos 13 dígitos (tarjetas válidas tienen entre 13 y 19 dígitos)
+        const cardNumberClean = formData.cardNumber.replace(/\s/g, "");
+        if (!/^\d{13,19}$/.test(cardNumberClean)) {
+          newErrors.cardNumber = "El número de tarjeta no es válido";
+        }
+      }
+      
+      if (!formData.expiryDate || formData.expiryDate.trim() === "") {
+        newErrors.expiryDate = "La fecha de vencimiento es requerida";
+      } else {
+        // Validar formato MM/AA
+        if (!/^\d{2}\/\d{2}$/.test(formData.expiryDate)) {
+          newErrors.expiryDate = "El formato debe ser MM/AA";
+        }
+      }
+      
+      if (!formData.cvv || formData.cvv.trim() === "") {
+        newErrors.cvv = "El CVV es requerido";
+      } else {
+        // Validar que CVV tenga 3 o 4 dígitos
+        if (!/^\d{3,4}$/.test(formData.cvv)) {
+          newErrors.cvv = "El CVV debe tener 3 o 4 dígitos";
+        }
+      }
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const nextStep = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Validar campos del paso 1 antes de avanzar
+    if (currentStep === 1) {
+      if (!validateStep1()) {
+        setToastMessage('Por favor completa todos los campos requeridos');
+        setToastType('error');
+        setShowToast(true);
+        return;
+      }
+    }
+    // Validar campos del paso 2 antes de avanzar
+    if (currentStep === 2) {
+      if (!validateStep2()) {
+        setToastMessage('Por favor completa todos los campos de la tarjeta');
+        setToastType('error');
+        setShowToast(true);
+        return;
+      }
+    }
     setCurrentStep(currentStep + 1);
   };
 
-  const prevStep = () => {
+  const prevStep = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     setCurrentStep(currentStep - 1);
   };
 
@@ -136,6 +239,38 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
   const handleModalClick = (e) => {
     e.stopPropagation();
   };
+
+  // Cargar datos del usuario si está autenticado
+  useEffect(() => {
+    if(isOpen)
+      setFormData(prev => ({
+        ...prev,
+        name: user.nombre ?? "",
+        email: user.email ?? "",
+      }));
+      
+  }, [isOpen]);
+
+  // Limpiar errores cuando se cierra el modal o se cambia de paso
+  useEffect(() => {
+    if (!isOpen) {
+      setErrors({});
+    }
+  }, [isOpen]);
+
+  // Limpiar errores de tarjeta cuando se cambia el método de pago a transferencia
+  useEffect(() => {
+    console.log(formData.paymentMethod);
+    if (formData.paymentMethod === "transfer") {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.cardNumber;
+        delete newErrors.expiryDate;
+        delete newErrors.cvv;
+        return newErrors;
+      });
+    }
+  }, [formData.paymentMethod]);
 
   if (!isOpen) return null;
 
@@ -179,7 +314,9 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
                   value={formData.name}
                   onChange={handleInputChange}
                   required
+                  className={errors.name ? "error" : ""}
                 />
+                {errors.name && <span className="error-message">{errors.name}</span>}
               </div>
               <div className="form-group">
                 <label htmlFor="email">Email *</label>
@@ -190,7 +327,9 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
+                  className={errors.email ? "error" : ""}
                 />
+                {errors.email && <span className="error-message">{errors.email}</span>}
               </div>
               <div className="form-group">
                 <label htmlFor="phone">Teléfono *</label>
@@ -201,7 +340,9 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
                   value={formData.phone}
                   onChange={handleInputChange}
                   required
+                  className={errors.phone ? "error" : ""}
                 />
+                {errors.phone && <span className="error-message">{errors.phone}</span>}
               </div>
               <div className="form-group">
                 <label htmlFor="address">Dirección de Envío *</label>
@@ -212,7 +353,9 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
                   onChange={handleInputChange}
                   rows="3"
                   required
+                  className={errors.address ? "error" : ""}
                 />
+                {errors.address && <span className="error-message">{errors.address}</span>}
               </div>
             </div>
           )}
@@ -267,7 +410,9 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
                       placeholder="1234 5678 9012 3456"
                       maxLength="19"
                       required
+                      className={errors.cardNumber ? "error" : ""}
                     />
+                    {errors.cardNumber && <span className="error-message">{errors.cardNumber}</span>}
                   </div>
                   <div className="form-row">
                     <div className="form-group">
@@ -281,7 +426,9 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
                         placeholder="MM/AA"
                         maxLength="5"
                         required
+                        className={errors.expiryDate ? "error" : ""}
                       />
+                      {errors.expiryDate && <span className="error-message">{errors.expiryDate}</span>}
                     </div>
                     <div className="form-group">
                       <label htmlFor="cvv">CVV *</label>
@@ -294,7 +441,9 @@ const PaymentModal = ({ isOpen, onClose, cart, onClearCart }) => {
                         placeholder="123"
                         maxLength="4"
                         required
+                        className={errors.cvv ? "error" : ""}
                       />
+                      {errors.cvv && <span className="error-message">{errors.cvv}</span>}
                     </div>
                   </div>
                 </div>
