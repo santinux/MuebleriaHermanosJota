@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const authMiddleware = async (req, res, next) => {
+  let token;
   try {
     // Obtener el token del header Authorization
     const authHeader = req.headers.authorization;
@@ -14,7 +15,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     // Extraer el token (remover "Bearer ")
-    let token = authHeader.substring(7);
+    token = authHeader.substring(7);
 
     if (!token) {
       return res.status(401).json({

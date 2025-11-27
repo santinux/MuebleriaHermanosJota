@@ -2,6 +2,8 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 const mongoose = require('mongoose');
 
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
 // Crear un nuevo pedido
 const createOrder = async (req, res, next) => {
   try {
@@ -72,7 +74,7 @@ const createOrder = async (req, res, next) => {
       }
       
       if (!product) {
-        return res.status(400).json({
+        return res.status(404).json({
           success: false,
           message: `Producto con ID ${productId} no encontrado`
         });
@@ -149,6 +151,13 @@ const getOrderById = async (req, res, next) => {
     const { id } = req.params;
     const userId = req.user._id;
 
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de pedido inválido'
+      });
+    }
+
     const order = await Order.findOne({ _id: id, user: userId })
       .populate('items.product', 'nombre imagenUrl descripcion');
 
@@ -165,6 +174,12 @@ const getOrderById = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Error al obtener pedido:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de pedido inválido'
+      });
+    }
     next(error);
   }
 };
@@ -262,6 +277,13 @@ const updateOrderStatus = async (req, res, next) => {
     const { id } = req.params;
     const { status } = req.body;
 
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de pedido inválido'
+      });
+    }
+
     const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
@@ -292,6 +314,113 @@ const updateOrderStatus = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Error al actualizar estado del pedido:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de pedido inválido'
+      });
+    }
+    next(error);
+  }
+};
+
+// Actualizar pedido del usuario (solo mientras está pendiente)
+const updateOrder = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de pedido inválido'
+      });
+    }
+
+    const order = await Order.findOne({ _id: id, user: req.user._id });
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pedido no encontrado'
+      });
+    }
+
+    if (order.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'Solo se pueden modificar pedidos pendientes'
+      });
+    }
+
+    const { shippingInfo, paymentMethod } = req.body;
+
+    if (shippingInfo) {
+      order.shippingInfo = {
+        ...(order.shippingInfo || {}),
+        ...shippingInfo
+      };
+    }
+
+    if (paymentMethod) {
+      order.paymentMethod = paymentMethod;
+    }
+
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Pedido actualizado exitosamente',
+      data: order
+    });
+  } catch (error) {
+    console.error('Error al actualizar pedido:', error);
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: messages.join(', ')
+      });
+    }
+    next(error);
+  }
+};
+
+// Eliminar pedido (usuario o admin)
+const deleteOrder = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de pedido inválido'
+      });
+    }
+
+    const filter = req.user.role === 'admin'
+      ? { _id: id }
+      : { _id: id, user: req.user._id };
+
+    const order = await Order.findOne(filter);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pedido no encontrado'
+      });
+    }
+
+    if (req.user.role !== 'admin' && order.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'Solo puedes eliminar pedidos pendientes'
+      });
+    }
+
+    await order.deleteOne();
+
+    res.json({
+      success: true,
+      message: 'Pedido eliminado exitosamente'
+    });
+  } catch (error) {
+    console.error('Error al eliminar pedido:', error);
     next(error);
   }
 };
@@ -302,6 +431,8 @@ module.exports = {
   getOrderById,
   getAllOrders,
   getOrderStats,
-  updateOrderStatus
+  updateOrderStatus,
+  updateOrder,
+  deleteOrder
 };
 

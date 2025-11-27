@@ -79,9 +79,75 @@ const obtenerContactos = (req, res, next) => {
     }
 };
 
+// Actualizar un contacto (solo estado/respuesta)
+const actualizarContacto = (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const contactId = Number(id);
+
+        if (Number.isNaN(contactId)) {
+            return res.status(400).json({ message: 'ID de contacto inválido' });
+        }
+
+        const contact = contacts.find(contacto => contacto.id === contactId);
+        if (!contact) {
+            return res.status(404).json({ message: 'Contacto no encontrado' });
+        }
+
+        const { status, responseMessage } = req.body;
+
+        if (status) {
+            contact.status = status;
+        }
+
+        if (responseMessage) {
+            contact.responseMessage = responseMessage.trim();
+        }
+
+        saveContactsToFile();
+
+        res.json({
+            success: true,
+            message: 'Contacto actualizado exitosamente',
+            data: contact
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Eliminar contacto
+const eliminarContacto = (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const contactId = Number(id);
+
+        if (Number.isNaN(contactId)) {
+            return res.status(400).json({ message: 'ID de contacto inválido' });
+        }
+
+        const index = contacts.findIndex(contacto => contacto.id === contactId);
+        if (index === -1) {
+            return res.status(404).json({ message: 'Contacto no encontrado' });
+        }
+
+        contacts.splice(index, 1);
+        saveContactsToFile();
+
+        res.json({
+            success: true,
+            message: 'Contacto eliminado exitosamente'
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 module.exports = {
     recibirContacto,
     obtenerContactos,
+    actualizarContacto,
+    eliminarContacto,
     loadContactsFromFile
 };

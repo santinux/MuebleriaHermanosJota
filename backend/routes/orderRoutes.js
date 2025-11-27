@@ -6,7 +6,9 @@ const {
   getOrderById,
   getAllOrders,
   getOrderStats,
-  updateOrderStatus
+  updateOrderStatus,
+  updateOrder,
+  deleteOrder
 } = require('../controllers/orderController');
 const authMiddleware = require('../middleware/auth');
 
@@ -29,6 +31,10 @@ router.put('/admin/:id/estado', updateOrderStatus);
 
 // Obtener todos los pedidos del usuario (debe ir después de las rutas de admin)
 router.get('/', getUserOrders);
+
+// Actualizar o eliminar pedidos del usuario
+router.put('/:id', updateOrder);
+router.delete('/:id', deleteOrder);
 
 // Obtener un pedido específico (debe ir al final para no interceptar las rutas de admin)
 router.get('/:id', getOrderById);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/App.css';
+import { API_ENDPOINTS } from '../config/api';
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -38,13 +39,16 @@ function Contact() {
     setIsSubmitting(true);
     setError('');
 
-    fetch('http://localhost:3000/api/contacto', {
+    fetch(API_ENDPOINTS.CONTACT_FORM, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
     })
-      .then(res => res.json())
-      .then(data => {
+      .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.message || 'Hubo un error al enviar el mensaje');
+        }
         console.log('Respuesta del backend:', data);
         if (data.success) {
           setShowSuccess(true);
@@ -55,7 +59,7 @@ function Contact() {
       })
       .catch(err => {
         console.error('Error al enviar el formulario:', err);
-        setError('No se pudo enviar el mensaje. Intentá más tarde.');
+        setError(err.message || 'No se pudo enviar el mensaje. Intentá más tarde.');
       })
       .finally(() => {
         setIsSubmitting(false);
