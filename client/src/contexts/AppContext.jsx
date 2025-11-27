@@ -177,6 +177,7 @@ export default function AppProvider({ children }) {
         setUser(null);
         setToken(null);
         setCurrentPage("home");
+        clearCart();
     };
 
     const isAuthenticated = !!user && !!token;
