@@ -9,7 +9,10 @@ const {
     updateProduct,
     deleteProduct
 } = require('../controllers/productController');
+const authMiddleware = require('../middleware/auth');
+const adminMiddleware = require('../middleware/admin');
 
+// Rutas públicas (no requieren autenticación)
 // GET /api/productos - Obtener todos los productos
 router.get('/', getAllProducts);
 
@@ -22,13 +25,14 @@ router.get('/search', searchProducts);
 // GET /api/productos/:id - Obtener producto por ID
 router.get('/:id', getProductById);
 
+// Rutas protegidas (requieren autenticación y rol admin)
 // POST /api/productos - Crear un nuevo producto
-router.post('/', createProduct);
+router.post('/', authMiddleware, adminMiddleware, createProduct);
 
 // PUT /api/productos/:id - Actualizar un producto existente
-router.put('/:id', updateProduct);
+router.put('/:id', authMiddleware, adminMiddleware, updateProduct);
 
 // DELETE /api/productos/:id - Eliminar un producto
-router.delete('/:id', deleteProduct);
+router.delete('/:id', authMiddleware, adminMiddleware, deleteProduct);
 
 module.exports = router;

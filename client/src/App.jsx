@@ -11,6 +11,7 @@ import Footer from "./components/Footer.jsx";
 import NewProduct from "./pages/NewProduct.jsx";
 import EditProduct from "./pages/EditProduct.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import AdminRoute from "./components/AdminRoute.jsx";
 import { NotFound } from "./pages/NotFound.jsx";
 import { getFeaturedProducts } from "./services/productServices.js";
 import { Routes, Route } from "react-router-dom";
@@ -39,8 +40,22 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route path="/admin/crear-producto" element={<NewProduct />} />
-          <Route path="/admin/editar-producto/:id" element={<EditProduct />} />
+          <Route 
+            path="/admin/crear-producto" 
+            element={
+              <AdminRoute>
+                <NewProduct />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/editar-producto/:id" 
+            element={
+              <AdminRoute>
+                <EditProduct />
+              </AdminRoute>
+            } 
+          />
           {/* Ruta para manejar rutas no definidas */}
           <Route path="*" element={<NotFound />} />
         </Routes>
