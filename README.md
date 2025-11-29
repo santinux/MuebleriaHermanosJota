@@ -181,6 +181,43 @@ El navegador se abrirá automáticamente y verás la aplicación funcionando.
 2. Las credenciales en `.env` sean correctas
 3. Ambos servidores estén corriendo
 
+## 🔐 Autenticación y Usuarios
+
+### Cuenta de Administrador de Prueba
+
+Para acceder a las funcionalidades de administrador (crear, editar y eliminar productos), puedes usar la siguiente cuenta de prueba:
+
+**Email:** `test@gmail.com`  
+**Contraseña:** `test123`  
+**Rol:** Administrador
+
+### Funcionalidades de Administrador
+
+Con esta cuenta podrás:
+- ✅ Crear nuevos productos
+- ✅ Editar productos existentes
+- ✅ Eliminar productos
+- ✅ Ver y gestionar pedidos
+- ✅ Acceder a estadísticas de pedidos
+
+### Cómo Iniciar Sesión
+
+1. Ve a la página de inicio de sesión: `/login`
+2. Ingresa las credenciales:
+   - Email: `test@gmail.com`
+   - Contraseña: `test123`
+3. Una vez autenticado, podrás acceder a:
+   - `/admin/crear-producto` - Crear nuevo producto
+   - `/admin/editar-producto/:id` - Editar producto existente
+   - `/perfil` - Ver tu perfil y gestionar pedidos
+
+### Registro de Nuevos Usuarios
+
+También puedes registrar nuevos usuarios desde `/registro`. Los usuarios nuevos tendrán rol de `client` por defecto y podrán:
+- Ver productos
+- Agregar productos al carrito
+- Realizar pedidos
+- Ver su perfil y pedidos
 
 ## 📡 API Endpoints
 
@@ -194,9 +231,15 @@ El navegador se abrirá automáticamente y verás la aplicación funcionando.
 | GET | `/api/productos/:id` | Obtener producto por ID |
 | GET | `/api/productos/featured` | Obtener productos destacados |
 | GET | `/api/productos/search?q=termino` | Buscar productos |
-| POST | `/api/productos` | Crear un nuevo producto |
-| PUT | `/api/productos/:id` | Actualizar un producto |
-| DELETE | `/api/productos/:id` | Eliminar un producto |
+| POST | `/api/productos` | Crear un nuevo producto (requiere autenticación + rol admin) |
+| PUT | `/api/productos/:id` | Actualizar un producto (requiere autenticación + rol admin) |
+| DELETE | `/api/productos/:id` | Eliminar un producto (requiere autenticación + rol admin) |
+| POST | `/api/auth/registro` | Registrar nuevo usuario |
+| POST | `/api/auth/login` | Iniciar sesión |
+| GET | `/api/auth/perfil` | Obtener perfil del usuario (requiere autenticación) |
+| POST | `/api/pedidos` | Crear un nuevo pedido (requiere autenticación) |
+| GET | `/api/pedidos` | Obtener pedidos del usuario (requiere autenticación) |
+| GET | `/api/pedidos/:id` | Obtener pedido específico (requiere autenticación) |
 
 ### Ejemplos de Uso:
 
@@ -213,15 +256,33 @@ curl http://localhost:3000/api/productos/1
 # Buscar productos
 curl http://localhost:3000/api/productos/search?q=mesa
 
-# Crear un nuevo producto (requiere autenticación)
+# Crear un nuevo producto (requiere autenticación + rol admin)
 curl -X POST http://localhost:3000/api/productos \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TU_TOKEN_JWT" \
   -d '{
     "nombre": "Mesa de Centro",
     "descripcion": "Mesa moderna",
     "precio": 25000,
     "stock": 10,
     "categoria": "mesas"
+  }'
+
+# Iniciar sesión
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@gmail.com",
+    "password": "test123"
+  }'
+
+# Registrar nuevo usuario
+curl -X POST http://localhost:3000/api/auth/registro \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombre": "Juan Pérez",
+    "email": "juan@example.com",
+    "password": "password123"
   }'
 ```
 
